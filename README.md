@@ -1,8 +1,7 @@
 # TDP
 
 ## TDP란
-Today I Learned Deserter Pursuit의 약자로서,<br>
-TIL(Today I Learned) 관리 시스템입니다.
+"Today I Learned Deserter Pursuit"의 약자로서, TIL(Today I Learned) 관리 시스템입니다.
 
 ## 핵심 기능
 - 회원가입 CRUD
