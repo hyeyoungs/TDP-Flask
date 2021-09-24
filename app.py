@@ -23,6 +23,12 @@ def my_page():
 def home():
     return render_template('home.html')
 
+@app.route('/delete', methods=['POST'])
+def delete_til():
+    til_id = request.form['til_id']
+    db.til.delete_one({'_id': til_id})
+    return jsonify({'msg': '삭제 완료!'})
+
 
 
 if __name__ == '__main__':
