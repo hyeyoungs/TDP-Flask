@@ -9,6 +9,8 @@
     - TIL 수정, 삭제
 - TIL Board
     - TIL Card List
+
+## 부가 기능
 - 회원가입 CRUD
 - 로그인 / 로그아웃
 - 메인 페이지
