@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 from flask import Flask, render_template, jsonify, request
 from datetime import datetime
 from pymongo import MongoClient
@@ -22,6 +23,20 @@ def my_page():
 @app.route('/home')
 def home():
     return render_template('home.html')
+=======
+from flask import Flask, render_template, request, jsonify, redirect, url_for
+from pymongo import MongoClient
+import requests
+
+app = Flask(__name__)
+
+client = MongoClient('mongodb://test:test@localhost', 27017)
+db = client.dbsparta_plus_week2
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+>>>>>>> Stashed changes
 
 
 if __name__ == '__main__':
