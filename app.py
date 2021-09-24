@@ -29,6 +29,11 @@ def delete_til():
     db.til.delete_one({'_id': til_id})
     return jsonify({'msg': '삭제 완료!'})
 
+@app.route('/', methods=['GET'])
+def show_til():
+    temp = list(db.til.find({}, {'_id': False}))
+    return jsonify({'tils': temp})
+
 
 
 if __name__ == '__main__':
