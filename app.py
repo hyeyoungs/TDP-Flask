@@ -32,7 +32,15 @@ def delete_til():
 @app.route('/', methods=['GET'])
 def show_til():
     temp = list(db.til.find({}, {'_id': False}))
-    return jsonify({'tils': temp})
+    return jsonify({'til_list': temp})
+
+@app.route('/', methods=['GET','POST'])
+def search_title_til():
+    til_title = request.form['search_title']      #제목으로 검색
+    # til_title = request.form['search_author'] 작가는? url이 겹칠텐데
+    temp = list(db.til.find({'title': til_title}, {'_id': False}))
+    return jsonify({'result':'success' }, {'til_list': temp})
+
 
 
 
