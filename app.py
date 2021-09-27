@@ -44,20 +44,20 @@ def search_title_til():
 
 @app.route('/api/update', methods=['POST'])
 def api_update():
-    til_id_receive = request.form['til_id_give']
+    til_no_receive = request.form['til_no_give']
     til_title_receive = request.form['til_title_give']
     til_content_receive = request.form['til_content_give']
     current_time = datetime.now()
     
     doc = {'til_title' : til_title_receive, 'til_content' : til_content_receive, 'til_update_day' : current_time}
-    db.til.update_one({'til_id': til_id_receive}, doc)
+    db.til.update_one({'til_no': til_no_receive}, doc)
     return jsonify({'msg': '수정 완료!'})
 
 @app.route('/api/create', methods=['POST'])
 def api_create():
-    til_user_receive = request.form['user_give']
-    til_title_receive = request.form['title_give']
-    til_content_receive = request.form['content_give']
+    til_user_receive = request.form['til_user_give']
+    til_title_receive = request.form['til_title_give']
+    til_content_receive = request.form['til_content_give']
     current_time = datetime.now()
     
     doc = {'til_title': til_title_receive, 'til_user': til_user_receive, 'til_content': til_content_receive, 'til_day': current_time}
