@@ -30,19 +30,19 @@ def create_page():
 
 @app.route('/til_board', methods=['POST'])
 def delete_til():
-    til_no = request.form['til_no']
-    db.til.delete_one({'til_no': til_no})
+    til_no_receive = request.form['til_no_give']
+    db.tdp.delete_one({'til_no': til_no_receive})
     return jsonify({'msg': '삭제 완료!'})
 
 @app.route('/til_board', methods=['GET','POST'])
 def read_til():
-    til_no = request.form['til_no']
-    temp = db.til.find_one({'til_no': til_no})
+    til_no_receive = request.form['til_no_give']
+    temp = db.tdp.find_one({'til_no': til_no_receive})
     return jsonify({'til': temp})
 
 @app.route('/til_board', methods=['GET'])
 def all_til():
-    temp = list(db.til.find({}, {'_id': False}))
+    temp = list(db.tdp.find({}, {'_id': False}))
     return jsonify({'result':'success'}, {'all_til': temp})
 
 
