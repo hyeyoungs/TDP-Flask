@@ -42,7 +42,6 @@ def search_title_til():
     temp = list(db.til.find({'title': til_title}, {'_id': False}))
     return jsonify({'result':'success' }, {'til_list': temp})
 
-
 @app.route('/api/update', methods=['POST'])
 def api_update():
     til_id_receive = request.form['til_id_give']
