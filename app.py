@@ -23,25 +23,22 @@ def my_page():
 def home():
     return render_template('home.html')
 
-@app.route('/delete', methods=['POST'])
+@app.route('/write_til', methods=['POST'])
 def delete_til():
-    til_id = request.form['til_id']
-    db.til.delete_one({'_id': til_id})
+    til_no = request.form['til_no']
+    db.til.delete_one({'til_no': til_no})
     return jsonify({'msg': '삭제 완료!'})
 
-@app.route('/', methods=['GET'])
-def show_til():
+@app.route('/write_til', methods=['GET','POST'])
+def read_til():
+    til_no = request.form['til_no']
+    temp = db.til.find_one({'til_no': til_no})
+    return jsonify({'til': temp})
+
+@app.route('/write_til', methods=['GET'])
+def all_til():
     temp = list(db.til.find({}, {'_id': False}))
-    return jsonify({'til_list': temp})
-
-@app.route('/', methods=['GET','POST'])
-def search_title_til():
-    til_title = request.form['search_title']      #제목으로 검색
-    # til_title = request.form['search_author'] 작가는? url이 겹칠텐데
-    temp = list(db.til.find({'title': til_title}, {'_id': False}))
-    return jsonify({'result':'success' }, {'til_list': temp})
-
-
+    return jsonify({'result':'success'}, {'all_til': temp})
 
 
 if __name__ == '__main__':
