@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 # pc 용 :
 client = MongoClient('localhost', 27017)
+db = client.tdp
 
 @app.route('/')
 def main_page():
@@ -23,23 +24,24 @@ def my_page():
 def home():
     return render_template('home.html')
 
-@app.route('/til_board', methods=['POST'])
+
+@app.route('/delete', methods=['POST'])
 def delete_til():
-    til_no_receive = request.form['til_no_give']
-    db.tdp.delete_one({'til_no': til_no})
+    til_id = request.form['til_id']
+    db.til.delete_one({'_id': til_id})
     return jsonify({'msg': '삭제 완료!'})
 
-@app.route('/til_board', methods=['GET','POST'])
-def read_til():
-    til_no_receive = request.form['til_no_give']
-    temp = db.tdp.find_one({'til_no': til_no})
-    return jsonify({'til': temp})
+@app.route('/til_borad', methods=['GET'])
+def show_til():
+    temp = list(db.til.find({}, {'_id': False}))
+    return jsonify({'til_list': temp})
 
-@app.route('/til_board', methods=['GET'])
-def all_til():
-    temp = list(db.tdp.find({}, {'_id': False}))
-    return jsonify({'result':'success'}, {'all_til': temp})
-
+@app.route('/', methods=['GET','POST'])
+def search_title_til():
+    til_title = request.form['search_title']      #제목으로 검색
+    # til_title = request.form['search_author'] 작가는? url이 겹칠텐데
+    temp = list(db.til.find({'title': til_title}, {'_id': False}))
+    return jsonify({'result':'success' }, {'til_list': temp})
 
 @app.route('/api/update', methods=['POST'])
 def api_update():
@@ -62,7 +64,6 @@ def api_create():
     doc = {'til_title': til_title_receive, 'til_user': til_user_receive, 'til_content': til_content_receive, 'til_day': current_time}
     db.til.insert_one(doc)
     return jsonify({'msg': 'til 작성 완료!'})
->>>>>>> Stashed changes
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
