@@ -60,7 +60,7 @@ def api_create():
     til_content_receive = request.form['content_give']
     current_time = datetime.now()
     
-    doc = {'til_title': til_title_receive, 'til_content': til_content_receive, 'til_user': til_user_receive, 'til_content': til_content_receive, 'til_day': current_time}
+    doc = {'til_title': til_title_receive, 'til_user': til_user_receive, 'til_content': til_content_receive, 'til_day': current_time}
     db.til.insert_one(doc)
     return jsonify({'msg': 'til 작성 완료!'})
 
