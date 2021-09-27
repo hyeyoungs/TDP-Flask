@@ -23,6 +23,19 @@ def my_page():
 def home():
     return render_template('home.html')
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+=======
+client = MongoClient('mongodb://test:test@localhost', 27017)
+db = client.dbsparta_plus_week2
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+>>>>>>> Stashed changes
 @app.route('/write_til', methods=['POST'])
 def delete_til():
     til_no = request.form['til_no']
@@ -39,6 +52,16 @@ def read_til():
 def all_til():
     temp = list(db.til.find({}, {'_id': False}))
     return jsonify({'result':'success'}, {'all_til': temp})
+<<<<<<< Updated upstream
+=======
+
+
+
+
+
+
+
+>>>>>>> Stashed changes
 
 
 if __name__ == '__main__':
