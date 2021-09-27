@@ -57,9 +57,19 @@ def delete_til():
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 @app.route('/write_til', methods=['GET','POST'])
 =======
+@app.route('/til_board', methods=['GET','POST'])
+>>>>>>> Stashed changes
+=======
+@app.route('/til_board', methods=['POST'])
+def delete_til():
+    til_no = request.form['til_no']
+    db.til.delete_one({'til_no': til_no})
+    return jsonify({'msg': '삭제 완료!'})
+
 @app.route('/til_board', methods=['GET','POST'])
 >>>>>>> Stashed changes
 def read_til():
@@ -67,6 +77,7 @@ def read_til():
     temp = db.til.find_one({'til_no': til_no})
     return jsonify({'til': temp})
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 =======
 @app.route('/write_til', methods=['GET','POST'])
@@ -83,6 +94,16 @@ def read_til():
 def all_til():
     temp = list(db.til.find({}, {'_id': False}))
     return jsonify({'result':'success'}, {'all_til': temp})
+=======
+@app.route('/til_board', methods=['GET'])
+def all_til():
+    temp = list(db.til.find({}, {'_id': False}))
+    return jsonify({'result':'success'}, {'all_til': temp})
+
+
+
+
+>>>>>>> Stashed changes
 
 @app.route('/api/update', methods=['POST'])
 def api_update():
