@@ -34,6 +34,14 @@ def show_til():
     temp = list(db.til.find({}, {'_id': False}))
     return jsonify({'tils': temp})
 
+@app.route('/api/update', methods=['POST'])
+def api_update():
+    til_id_receive = request.form['til_id_give']
+    til_title_receive = request.form['til_title_give']
+    til_content_receive = request.form['til_content_give']
+    current_time = datetime.now()
+    db.til.update_one({'til_id': til_id_receive}, {'til_title' : til_title_receive, 'til_content' : til_content_receive, 'til_update_day' : current_time})
+
 
 
 if __name__ == '__main__':
