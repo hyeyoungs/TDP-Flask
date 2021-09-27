@@ -32,6 +32,7 @@ client = MongoClient('mongodb://test:test@localhost', 27017)
 db = client.dbsparta_plus_week2
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -46,19 +47,27 @@ db = client.dbsparta_plus_week2
 =======
 >>>>>>> Stashed changes
 @app.route('/write_til', methods=['POST'])
+=======
+@app.route('/til_board', methods=['POST'])
+>>>>>>> Stashed changes
 def delete_til():
     til_no = request.form['til_no']
     db.til.delete_one({'til_no': til_no})
     return jsonify({'msg': '삭제 완료!'})
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
 @app.route('/write_til', methods=['GET','POST'])
+=======
+@app.route('/til_board', methods=['GET','POST'])
+>>>>>>> Stashed changes
 def read_til():
     til_no = request.form['til_no']
     temp = db.til.find_one({'til_no': til_no})
     return jsonify({'til': temp})
 
+<<<<<<< Updated upstream
 =======
 @app.route('/write_til', methods=['GET','POST'])
 def read_til():
@@ -68,6 +77,9 @@ def read_til():
 
 >>>>>>> Stashed changes
 @app.route('/write_til', methods=['GET'])
+=======
+@app.route('/til_board', methods=['GET'])
+>>>>>>> Stashed changes
 def all_til():
     temp = list(db.til.find({}, {'_id': False}))
     return jsonify({'result':'success'}, {'all_til': temp})
