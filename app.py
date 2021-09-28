@@ -10,7 +10,7 @@ db = client.tdp
 
 @app.route('/') #FD
 def main_page():
-    return render_template('main_page.html')
+    return render_template('home.html')
 
 @app.route('/signup_page')
 def signup_page():
