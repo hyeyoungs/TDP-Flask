@@ -42,7 +42,7 @@
         }
         $(document).on('click', '#btnList', function(e){
             e.preventDefault();
-            location.href="${pageContext.request.contextPath}/board/getBoardList";
+           window.history.back();
         });
     </script>
 </head>
@@ -72,7 +72,7 @@
 			</form>
 			<div>
 				<button onclick="makeTIL()" type="button" class="btn btn-sm btn-primary" id="btnSave">저장</button>
-				<button type="button" class="btn btn-sm btn-primary" href="./post" id="btnList">목록</button>
+				<button type="button" class="btn btn-sm btn-primary" onclick="goBack()" id="btnList">목록</button>
 			</div>
 		</div>
 	</article>
