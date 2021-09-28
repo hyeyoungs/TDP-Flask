@@ -24,10 +24,6 @@ def my_page():
 def home():
     return render_template('home.html')
 
-@app.route('/create')
-def create_page():
-    return render_template('create.html')
-
 @app.route('/til_board', methods=['POST'])
 def delete_til():
     til_no_receive = request.form['til_no_give']
