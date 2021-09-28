@@ -8,7 +8,7 @@ app = Flask(__name__)
 client = MongoClient('localhost', 27017)
 db = client.tdp
 
-@app.route('/')
+@app.route('/') #FD
 def main_page():
     return render_template('main_page.html')
 
