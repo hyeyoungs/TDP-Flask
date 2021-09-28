@@ -32,12 +32,9 @@
                 success: function (response) {
                         let all_til = response['all_til'];
                         for (let i = 0; i < 1; i++) {
-                            alert(i)
-                            alert(all_til)
                             let title = all_til[i]['til_title'];
                             let user = all_til[i]['til_user'];
                             let day = all_til[i]['til_day'];
-                            alert(title)
                             let temp_html = `<tr>
                                                 <th scope="row">${title}</th>
                                                 <td>${user}</td>
