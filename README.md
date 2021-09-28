@@ -9,9 +9,16 @@
     - TIL 수정, 삭제
 - TIL Board
     - TIL public, private  
-    - My Page 
-    - TIL Card List
+    - list both public, private (My Page) 
+    - list only public (TIL Card List) 
 
 ## 2차
 - 회원가입 CRUD
 - 로그인 / 로그아웃
+- TIL Notification
+
+## 3차
+- TIL Like
+- TIL Comment
+- TIL Rank
+- TIL Keyword
