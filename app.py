@@ -24,8 +24,8 @@ def my_page():
 def create_page():
     return render_template('create.html')
 
-@app.route('/til_board_page')
-def til_board_page():
+@app.route('/til_board')
+def til_board():
     return render_template('til_board.html')
 
 @app.route('/home')
