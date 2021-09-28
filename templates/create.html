@@ -6,6 +6,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> <script type="text/javascript" src="/js/bootstrap.js"></script>
+
 </head>
     <script>
 
@@ -15,10 +17,25 @@
 
 
 
+
 		$("#form").submit();
 
 	});
+	function makeTIL() {
 
+			let title = $('#title').val()
+			let user = $('#reg_id').val()
+			let content = $('#content').val()
+
+			$.ajax({
+				type: "POST",
+				url: "/api/create",
+				data: {til_user_give: title, til_title_give: user, til_content_give: content},
+				success: function (response) { // 성공하면
+					alert(response["msg"]);
+				}
+			})
+		}
 
 
 	$(document).on('click', '#btnList', function(e){
@@ -95,7 +112,7 @@
 
 			<div >
 
-				<button type="button" class="btn btn-sm btn-primary" id="btnSave">저장</button>
+				<button onclick="makeTIL()" type="button" class="btn btn-sm btn-primary" id="btnSave">저장</button>
 
 				<button type="button" class="btn btn-sm btn-primary" href="./post" id="btnList">목록</button>
 
