@@ -24,9 +24,25 @@ def my_page():
 def create_page():
     return render_template('create.html')
 
+@app.route('/til_board')
+def til_board():
+    return render_template('til_board.html')
+
 @app.route('/home')
 def home():
     return render_template('home.html')
+
+@app.route('/api/delete', methods=['POST'])
+def api_delete():
+    til_no_receive = request.form['til_no_give']
+    db.tdp.delete_one({'til_no': til_no_receive})
+    return jsonify({'msg': '삭제 완료!'})
+
+@app.route('/api/read', methods=['GET','POST'])
+def api_read():
+    til_no_receive = request.form['til_no_give']
+    temp = db.tdp.find_one({'til_no': til_no_receive})
+    return jsonify({'til': temp})
 
 @app.route('/til_board')
 def listing_page():
