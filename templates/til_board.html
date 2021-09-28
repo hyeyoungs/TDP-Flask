@@ -1,20 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- Bootstrap CSS -->
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-
-<body>
-<div class="container">
-    <table class="table">
-        <thead class="thead-light">
-        <tr class="text-center">
-            <th scope="col">TIL LIST</th>
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -59,52 +44,46 @@
                 }
             )
         }
-
         function til_search() {
-            $('#btn-search').click(function () {
-                $('#til-table > tbody:last').empty();
-            });
+
+            $('#til-table > tbody:last').empty();
             let til_title = $('#search').val()
 
             $.ajax({
-                type: "POST", "GET"
+                type: 'POST',
                 url: "/til_board",
                 data: {til_title: til_title},
                 success: function (response) {
+                    alert("dfs")
                     let find_til = response['til']
                     for (let i = 0; i < find_til.length; i++) {
-                        let title = find_til[i]['til_title'];
-                        let user = find_til[i]['til_user'];
-                        let day = find_til[i]['til_day'];
-                        let temp_html = `<tr>
-                                                <th scope="row">${title}</th>
-                                                <td>${user}</td>
+                            let title = find_til[i]['til_title'];
+                            let user = find_til[i]['til_user'];
+                            let day = find_til[i]['til_day'];
+                            let temp_html = `<tr>
+                                                <th scope="row">${user}</th>
+                                                <td>${title}</td>
                                                 <td>${day}</td>
                                             </tr>`
-                        $('#til-box').append(temp_html)
-                    }
+                            $('#til-box').append(temp_html)
+                        }
                 }
             })
         }
 
 
     </script>
-
-    <style>
-        .wrap {
-            margin: 50px auto;
-
-        }
-
-        .input-box {
-            margin: 50px auto;
-            width: 350px;
-        }
-    </style>
 </head>
 
 
 <body>
+<div class="container">
+    <table class="table">
+        <thead class="thead-light">
+        <tr class="text-center">
+            <th scope="col">TIL LIST</th>
+</div>
+
 <div class="wrap">
     <div class="input-box">
         <div class="input-group mb-3">
@@ -119,8 +98,8 @@
         <table id="til-table" class="table">
             <thead>
             <tr>
-                <th scope="col">제목</th>
                 <th scope="col">작성자</th>
+                <th scope="col">제목</th>
                 <th scope="col">작성일</th>
             </tr>
             </thead>
