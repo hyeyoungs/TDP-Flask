@@ -20,6 +20,10 @@ def signup_page():
 def my_page():
     return render_template('my_page.html')
 
+@app.route('/create_page')
+def create_page():
+    return render_template('create.html')
+
 @app.route('/home')
 def home():
     return render_template('home.html')
