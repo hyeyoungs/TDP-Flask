@@ -44,15 +44,36 @@ def api_read():
     temp = db.tdp.find_one({'til_no': til_no_receive})
     return jsonify({'til': temp})
 
+@app.route('/til_board')
+def listing_page():
+    return render_template('til_board.html')
+
+# @app.route('/til_board', methods=['POST'])
+# def delete_til():
+#     til_id_receive = request.form['til_id_give']
+#     db.til.delete_one({'_id': til_id_receive})
+#     return jsonify({'msg': '삭제 완료!'})
+
+# @app.route('/til_board', methods=['GET', 'POST'])
+# def read_til():
+#     til_id_receive = request.form['til_id_give']
+#     temp = db.til.find_one({'_id': til_id_receive})
+#     return jsonify({'til': temp})
+
+@app.route('/til_board_listing', methods=['GET'])
+def all_til():
+    temp = list(db.til.find({}, {'_id': False}))
+    return jsonify({'result': "success", 'all_til': temp})
+
 @app.route('/api/update', methods=['POST'])
 def api_update():
-    til_no_receive = request.form['til_no_give']
+    til_id_receive = request.form['til_id_give']
     til_title_receive = request.form['til_title_give']
     til_content_receive = request.form['til_content_give']
     current_time = datetime.now()
-    
-    doc = {'til_title' : til_title_receive, 'til_content' : til_content_receive, 'til_update_day' : current_time}
-    db.til.update_one({'til_no': til_no_receive}, doc)
+
+    doc = {'til_title': til_title_receive, 'til_content': til_content_receive, 'til_update_day': current_time}
+    db.til.update_one({'_id': til_id_receive}, doc)
     return jsonify({'msg': '수정 완료!'})
 
 @app.route('/api/create', methods=['POST'])
@@ -61,7 +82,7 @@ def api_create():
     til_title_receive = request.form['til_title_give']
     til_content_receive = request.form['til_content_give']
     current_time = datetime.now()
-    
+
     doc = {'til_title': til_title_receive, 'til_user': til_user_receive, 'til_content': til_content_receive, 'til_day': current_time}
     db.til.insert_one(doc)
     return jsonify({'msg': 'til 작성 완료!'})
