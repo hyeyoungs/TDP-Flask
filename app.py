@@ -55,8 +55,8 @@ def home_til():
     return jsonify({'result': "success", 'home_til': temp})
 
 @app.route('/home_ranking', methods=['GET'])
-def home_til():
-    temp = list(db.til.find({}, {'_id': False}))
+def home_ranking():
+    temp = list(db.til.find({}, {"_id": 0, "til_user": 1}))
     return jsonify({'result': "success", 'home_til': temp})
 
 @app.route('/api/update', methods=['POST'])
