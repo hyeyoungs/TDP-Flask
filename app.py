@@ -51,9 +51,8 @@ def all_til():
 
 @app.route('/home_listing', methods=['GET'])
 def home_til():
-    temp = list(db.til.find({}, {'_id': False}))
+    temp = list(db.til.find({}, {'_id': False}).sort("_id",-1))
     return jsonify({'result': "success", 'home_til': temp})
-
 
 @app.route('/home_ranking', methods=['GET'])
 def home_til():
