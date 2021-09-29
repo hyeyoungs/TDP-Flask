@@ -54,18 +54,10 @@ def home_til():
     temp = list(db.til.find({}, {'_id': False}).sort("_id",-1))
     return jsonify({'result': "success", 'home_til': temp})
 
-@app.route('/home_ranking', methods=['GET','POST'])
-def home_ranking():
-    # temp=db.til_orders.distinct("til_user")
-    # return jsonify({'result': "success",'home_ranking': temp})
-    codes = list(db.til.find({}).distinct("til_user"))
-    result= db.til.aggregate([
-        {"$group": {"_id": "$user.screen_name",
-                    "count":{"$sum":1}}},
-        {"$sort":{"count":-1} } ] )
-    return jsonify(result)
-
-
+@app.route('/home_ranking', methods=['GET'])
+def home_til():
+    temp = list(db.til.find({}, {'_id': False}))
+    return jsonify({'result': "success", 'home_til': temp})
 
 @app.route('/api/update', methods=['POST'])
 def api_update():
