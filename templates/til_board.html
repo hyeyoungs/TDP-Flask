@@ -54,7 +54,7 @@
                 url: "/til_board",
                 data: {til_title: til_title},
                 success: function (response) {
-                    alert("dfs")
+                   
                     let find_til = response['til']
                     for (let i = 0; i < find_til.length; i++) {
                             let title = find_til[i]['til_title'];
