@@ -10,7 +10,7 @@ db = client.tdp
 
 @app.route('/')
 def main_page():
-    return render_template('main_page.html')
+    return render_template('home.html')
 
 @app.route('/signup_page')
 def signup_page():
@@ -28,22 +28,26 @@ def create_page():
 def home():
     return render_template('home.html')
 
-@app.route('/til_board', methods=['POST'])
-def delete_til():
-    til_id_receive = request.form['til_id_give']
-    db.tdp.delete_one({'_id': til_id_receive})
-    return jsonify({'msg': '삭제 완료!'})
+@app.route('/til_board')
+def listing_page():
+    return render_template('til_board.html')
 
-@app.route('/til_board', methods=['GET', 'POST'])
-def read_til():
-    til_id_receive = request.form['til_id_give']
-    temp = db.tdp.find_one({'_id': til_id_receive})
-    return jsonify({'til': temp})
+# @app.route('/til_board', methods=['POST'])
+# def delete_til():
+#     til_id_receive = request.form['til_id_give']
+#     db.til.delete_one({'_id': til_id_receive})
+#     return jsonify({'msg': '삭제 완료!'})
 
-@app.route('/til_board', methods=['GET'])
+# @app.route('/til_board', methods=['GET', 'POST'])
+# def read_til():
+#     til_id_receive = request.form['til_id_give']
+#     temp = db.til.find_one({'_id': til_id_receive})
+#     return jsonify({'til': temp})
+
+@app.route('/til_board_listing', methods=['GET'])
 def all_til():
-    temp = list(db.tdp.find({}, {'_id': False}))
-    return jsonify({'result': 'success'}, {'all_til': temp})
+    temp = list(db.til.find({}, {'_id': False}))
+    return jsonify({'result': "success", 'all_til': temp})
 
 @app.route('/api/update', methods=['POST'])
 def api_update():

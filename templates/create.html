@@ -35,7 +35,7 @@
                 url: "/api/create",
                 data: {til_user_give: title, til_title_give: user, til_content_give: content},
                 success: function (response) { // 성공하면
-                    alert(response["msg"]);
+                    location.href="til_board";
                 }
             })
         }
