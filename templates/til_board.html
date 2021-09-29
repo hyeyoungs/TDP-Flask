@@ -1,20 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-    <!-- Bootstrap CSS -->
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-
-<body>
-<div class="container">
-    <table class="table">
-        <thead class="thead-light">
-        <tr class="text-center">
-            <th scope="col">#</th>
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -59,6 +44,34 @@
                 }
             )
         }
+        function til_search() {
+
+            $('#til-table > tbody:last').empty();
+            let til_title = $('#search').val()
+
+            $.ajax({
+                type: 'POST',
+                url: "/til_board",
+                data: {til_title: til_title},
+                success: function (response) {
+                   
+                    let find_til = response['til']
+                    for (let i = 0; i < find_til.length; i++) {
+                            let title = find_til[i]['til_title'];
+                            let user = find_til[i]['til_user'];
+                            let day = find_til[i]['til_day'];
+                            let temp_html = `<tr>
+                                                <th scope="row">${user}</th>
+                                                <td>${title}</td>
+                                                <td>${day}</td>
+                                            </tr>`
+                            $('#til-box').append(temp_html)
+                        }
+                }
+            })
+        }
+
+
     </script>
 </head>
 
@@ -66,49 +79,41 @@
 <body>
 <div class="container">
     <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">제목</th>
-            <th scope="col">작성자</th>
-            <th scope="col">작성일</th>
-        </tr>
-        </thead>
-
-        <tbody>
-        <tr class="text-center" th:each="post : ${postList}">
-            <th scope="row">
-                <span th:text="${post.id}"></span>
-            </th>
-            <td>
-                <a th:href="@{'/post/' + ${post.id}}">
-                    <span th:text="${post.title}"></span>
-                </a>
-            </td>
-            <td>
-                <span th:text="${post.author}"></span>
-            </td>
-            <td>
-                <span th:text="${#temporals.format(post.createdDate, 'yyyy-MM-dd HH:mm')}"></span>
-            </td>
-        </tr>
-
-        <tbody id="til-box">
-
-        </tbody>
-    </table>
-    <div class="row">
-        <div class="col-auto mr-auto"></div>
-        <div class="col-auto">
-           <a class="btn btn-primary" href="create.html" role="button">글쓰기</a>
-        </div>
-    </div>
-</div>
-<h1> hi</h1>
-
-            <a class="btn btn-primary" href="create_page" role="button">글쓰기</a>
-        </div>
-    </div>
+        <thead class="thead-light">
+        <tr class="text-center">
+            <th scope="col">TIL LIST</th>
 </div>
 
+<div class="wrap">
+    <div class="input-box">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">제목</span>
+            </div>
+            <input id="search" type="text" class="form-control" placeholder="검색어를 입력해주세요" aria-label="Username">
+            <button onclick="til_search()" type="button" id="btn-search" class="btn btn-primary">검색</button>
+        </div>
+    </div>
+    <div class="container">
+        <table id="til-table" class="table">
+            <thead>
+            <tr>
+                <th scope="col">작성자</th>
+                <th scope="col">제목</th>
+                <th scope="col">작성일</th>
+            </tr>
+            </thead>
+            <tbody id="til-box">
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col-auto mr-auto"></div>
+            <div class="col-auto">
+                <a class="btn btn-primary" href="create_page" role="button">글쓰기</a>
+            </div>
+        </div>
+    </div>
+
+</div>
 </body>
 </html>
