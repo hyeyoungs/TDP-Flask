@@ -7,24 +7,73 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
     <title>Title</title>
 </head>
+<script>
+
+    $(document).ready(function () {
+        listing();
+    });
+
+    function listing() {
+        $.ajax({
+                type: "GET",
+                url: "/home_listing",
+                data: {},
+                success: function (response) {
+                    let home_til = response['home_til'];
+                    for (let i = 0; i < 4; i++) {
+                        let title = home_til[i]['til_title'];
+                        let user = home_til[i]['til_user'];
+                        let content = home_til[i]['til_content'];
+                        let day = home_til[i]['til_day'];
+                        let temp_html = `
+                <div class="col" id="cards-box">
+               <div class="card">
+                <h5 class="card-subtitle">${user}</h5>
+               <div class="card-body">
+                <h5 class="card-title">${title}</h5>
+                <p class="card-text">${content}</p>
+                <p class="card-time">${day} </p>
+                </div>
+                  </div>
+`
+                        $('#boradmain').append(temp_html)
+                        console.log(temp_html)                    }
+                }
+            }
+        )
+    }
+</script>
 <style>
-    .navbar-brand{
+    .navbar-brand {
         margin-left: 70px;
     }
-    .nav-link{
+
+    .nav-link {
 
         margin-left: 150px;
     }
-    .rankingzon{
+
+    .rankingzon {
         margin-left: 999px;
         position: center;
     }
-    .left_write{
+
+    .left_write {
         margin-left: 70px;
     }
-    .boradmain{
+
+    .boradmain {
         margin-left: 20px;
     }
 
@@ -47,49 +96,21 @@
             </div>
         </div>
     </div>
-</nav><br><br><br>
+</nav>
+<br><br><br>
 <div class="left_write">
-<h1>당신의 TIL 작성을</h1><br>
-    <h1>관리해주는</h1><br><div class="rankingzon">
+    <h1>당신의 TIL 작성을</h1><br>
+    <h1>관리해주는</h1><br>
+    <div class="rankingzon">
         <h1> 랭킹존 </h1>
     </div>
     <h1>TIL 관리 서비스</h1>
 </div>
 <br>
 <br><br><br>
-<div class="row row-cols-4 row-cols-md-6 g-6 boradmain">
-  <div class="col">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      </div>
+<div class="row row-cols-3 row-cols-md-5 g-3 boradmain" id="boradmain">
+
     </div>
   </div>
-  <div class="col">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a short card.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-      </div>
-    </div>
-  </div>
-  <div class="col">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-      </div>
-    </div>
-  </div>
-</div>
 </body>
 </html>
