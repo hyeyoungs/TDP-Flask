@@ -22,6 +22,7 @@
 
     $(document).ready(function () {
         listing();
+        ranking();
     });
 
     function listing() {
@@ -48,7 +49,33 @@
                   </div>
 `
                         $('#boradmain').append(temp_html)
-                        console.log(temp_html)                    }
+                        console.log(temp_html)
+                    }
+                }
+            }
+        )
+    }
+
+    function ranking() {
+        $.ajax({
+                type: "GET",
+                url: "/home_ranking",
+                data: {},
+                success: function (response) {
+                    let home_ranking = response['home_ranking'];
+                     for (let i = 0; i < find_til.length; i++) {
+                         let user = find_til[i]['til_user'];
+                        let temp_html = `
+                   <tr>
+                <td class="rank">1</td>
+                <td class="team">Spain</td>
+                <td class="points">1460</td>
+                <td class="up-down">0</td>
+              </tr>
+`
+                        $('#ranker-box').append(temp_html)
+                        console.log(temp_html)
+                    }
                 }
             }
         )
@@ -65,8 +92,9 @@
     }
 
     .rankingzon {
-        margin-left: 999px;
         position: center;
+        float:right;
+        margin-right: 80px;
     }
 
     .left_write {
@@ -97,20 +125,35 @@
         </div>
     </div>
 </nav>
-<br><br><br>
+<br><br>
+ <div class="rankingzon">
+        <h1> 랭킹존 </h1>
+       <table>
+					<thead>
+						<tr>
+							<th>Rank</th>
+							<th>Team</th>
+							<th>Points</th>
+							<th>+/-</th>
+						</tr>
+					</thead>
+					<tbody id="ranker-box">
+
+					</tbody>
+				</table>
+    </div>
 <div class="left_write">
+ <br><br>
     <h1>당신의 TIL 작성을</h1><br>
     <h1>관리해주는</h1><br>
-    <div class="rankingzon">
-        <h1> 랭킹존 </h1>
-    </div>
+
     <h1>TIL 관리 서비스</h1>
 </div>
 <br>
 <br><br><br>
 <div class="row row-cols-3 row-cols-md-5 g-3 boradmain" id="boradmain">
 
-    </div>
-  </div>
+</div>
+</div>
 </body>
 </html>
