@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 # pc 용 :
 client = MongoClient('localhost', 27017)
-db = client.tdp
+db = client.til
 
 @app.route('/')
 def main_page():
@@ -24,9 +24,25 @@ def my_page():
 def create_page():
     return render_template('create.html')
 
+@app.route('/til_board')
+def til_board():
+    return render_template('til_board.html')
+
 @app.route('/home')
 def home():
     return render_template('home.html')
+
+@app.route('/api/delete', methods=['POST'])
+def api_delete():
+    til_no_receive = request.form['til_no_give']
+    db.til.delete_one({'til_no': til_no_receive})
+    return jsonify({'msg': '삭제 완료!'})
+
+@app.route('/api/read', methods=['GET','POST'])
+def api_read():
+    til_no_receive = request.form['til_no_give']
+    temp = db.til.find_one({'til_no': til_no_receive})
+    return jsonify({'til': temp})
 
 @app.route('/til_board')
 def listing_page():
@@ -38,11 +54,11 @@ def listing_page():
 #     db.til.delete_one({'_id': til_id_receive})
 #     return jsonify({'msg': '삭제 완료!'})
 
-# @app.route('/til_board', methods=['GET', 'POST'])
-# def read_til():
-#     til_id_receive = request.form['til_id_give']
-#     temp = db.til.find_one({'_id': til_id_receive})
-#     return jsonify({'til': temp})
+@app.route('/til_board', methods=['POST'])
+def read_til_detail():
+    til_id_receive = request.form['til_title']
+    temp = list(db.til.find({'til_title': til_id_receive}, {'_id': False}))
+    return jsonify({'result': "success", 'til': temp})
 
 @app.route('/til_board_listing', methods=['GET'])
 def all_til():
