@@ -56,8 +56,18 @@ def home_til():
 
 @app.route('/home_ranking', methods=['GET'])
 def home_ranking():
-    temp = list(db.til.find({}, {"_id": 0, "til_user": 1}))
-    return jsonify({'result': "success", 'home_til': temp})
+    agg_result=list(db.til.aggregate([
+    {"$group":
+        {
+            "_id": "$til_user",
+            "til_score": {"$sum": 1}
+        }
+    },
+    {"$sort":
+        {'til_score': -1}
+    }
+]))
+    return jsonify({'result': "success", 'home_til': agg_result})
 
 @app.route('/api/update', methods=['POST'])
 def api_update():
