@@ -41,8 +41,8 @@ db.til.find({})
 
 @app.route('/til_board', methods=['POST'])
 def read_til():
-    til_id_receive = request.form['til_id_give']
-    temp = db.til.find_one({'_id': til_id_receive})
+    til_title_receive = request.form['til_title']
+    temp = list(db.til.find({'til_title': til_title_receive}, {'_id': False}))
     return jsonify({'til': temp})
 
 @app.route('/til_board_listing', methods=['GET'])
