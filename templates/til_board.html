@@ -33,7 +33,8 @@
                             let title = all_til[i]['til_title'];
                             let user = all_til[i]['til_user'];
                             let day = all_til[i]['til_day'];
-                            let temp_html = `<tr>
+                            let temp_html = `<tr onClick="location.href='detail'" style="cursor:pointer;">
+
                                                 <th scope="row">${title}</th>
                                                 <td>${user}</td>
                                                 <td>${day}</td>
@@ -60,9 +61,11 @@
                         let user = find_til[i]['til_user'];
                         let day = find_til[i]['til_day'];
                         let temp_html = `<tr>
+
                                                 <th scope="row">${title}</th>
-                                                <td>${user}</td>
+                                                <td >${user}</td>
                                                 <td>${day}</td>
+
                                             </tr>`
                         $('#til-box').append(temp_html)
                     }

@@ -32,6 +32,12 @@ def home():
 def listing_page():
     return render_template('til_board.html')
 
+@app.route('/detail')
+def detail_page():
+    return render_template('detail.html')
+
+
+
 db.til.find({})
 # @app.route('/til_board', methods=['POST'])
 # def delete_til():
