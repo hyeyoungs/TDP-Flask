@@ -49,30 +49,31 @@
                   </div>
 `
                         $('#boradmain').append(temp_html)
-                        console.log(temp_html)
                     }
                 }
             }
         )
     }
 
-    function ranking() {
+     function ranking() {
         $.ajax({
                 type: "GET",
                 url: "/home_ranking",
                 data: {},
                 success: function (response) {
-                    let home_ranking = response['home_ranking'];
-                     for (let i = 0; i < find_til.length; i++) {
-                         let user = find_til[i]['til_user'];
+                    let home_til = response['home_til'];
+                    for (let i = 0; i < home_til.length; i++) {
+                        let user = home_til[i]['_id'];
+                        let ranker=+1;
+                        let score = home_til[i]['til_score'];
                         let temp_html = `
-                   <tr>
-                <td class="rank">1</td>
-                <td class="team">Spain</td>
-                <td class="points">1460</td>
-                <td class="up-down">0</td>
-              </tr>
+           <tr>
+           <th>${ranker}</th>
+                                                <th scope="row">${user}</th>
+                                                <td>${score}</td>
+                                            </tr>
 `
+
                         $('#ranker-box').append(temp_html)
                         console.log(temp_html)
                     }
@@ -80,6 +81,7 @@
             }
         )
     }
+
 </script>
 <style>
     .navbar-brand {
@@ -93,7 +95,7 @@
 
     .rankingzon {
         position: center;
-        float:right;
+        float: right;
         margin-right: 80px;
     }
 
@@ -126,24 +128,24 @@
     </div>
 </nav>
 <br><br>
- <div class="rankingzon">
-        <h1> 랭킹존 </h1>
-       <table>
-					<thead>
-						<tr>
-							<th>Rank</th>
-							<th>Team</th>
-							<th>Points</th>
-							<th>+/-</th>
-						</tr>
-					</thead>
-					<tbody id="ranker-box">
+<div class="rankingzon">
+    <h1> 랭킹존 </h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Team</th>
+            <th>Points</th>
+            <th>+/-</th>
+        </tr>
+        </thead>
+        <tbody id="ranker-box">
 
-					</tbody>
-				</table>
-    </div>
+        </tbody>
+    </table>
+</div>
 <div class="left_write">
- <br><br>
+    <br><br>
     <h1>당신의 TIL 작성을</h1><br>
     <h1>관리해주는</h1><br>
 
