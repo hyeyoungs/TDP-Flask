@@ -50,6 +50,10 @@ def all_til():
     temp = list(db.til.find({}, {'_id': False}))
     return jsonify({'result': "success", 'all_til': temp})
 
+@app.route('/detail/<content>')
+def detail(content):
+    return render_template("detail.html", content=content)
+
 @app.route('/home_listing', methods=['GET'])
 def home_til():
     temp = list(db.til.find({}, {'_id': False}).sort("_id",-1))
