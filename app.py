@@ -32,17 +32,18 @@ def home():
 def listing_page():
     return render_template('til_board.html')
 
+db.til.find({})
 # @app.route('/til_board', methods=['POST'])
 # def delete_til():
 #     til_id_receive = request.form['til_id_give']
 #     db.til.delete_one({'_id': til_id_receive})
 #     return jsonify({'msg': '삭제 완료!'})
 
-# @app.route('/til_board', methods=['GET', 'POST'])
-# def read_til():
-#     til_id_receive = request.form['til_id_give']
-#     temp = db.til.find_one({'_id': til_id_receive})
-#     return jsonify({'til': temp})
+@app.route('/til_board', methods=['POST'])
+def read_til():
+    til_id_receive = request.form['til_id_give']
+    temp = db.til.find_one({'_id': til_id_receive})
+    return jsonify({'til': temp})
 
 @app.route('/til_board_listing', methods=['GET'])
 def all_til():
