@@ -25,25 +25,13 @@ def my_page():
 def create_page():
     return render_template('create.html')
 
-@app.route('/update_page')
-def update_page():
-    return render_template('update.html')
-
 @app.route('/home')
 def home():
-    temp = list(db.til.find({}, {"_id": 0, "til_user": 1}))
-    print(temp)
     return render_template('home.html')
 
 @app.route('/til_board')
 def listing_page():
     return render_template('til_board.html')
-
-# @app.route('/til_board', methods=['GET', 'POST'])
-# def read_til():
-#     til_id_receive = request.form['til_id_give']
-#     temp = db.til.find_one({'_id': til_id_receive})
-#     return jsonify({'til': temp})
 
 @app.route('/til_board_listing', methods=['GET'])
 def all_til():
@@ -57,6 +45,26 @@ def read_myTIL():
     for doc in my_til:
        doc["_id"] = str(doc["_id"])
     return jsonify({'result' : 'success', 'my_til' : my_til})
+
+@app.route('/home_listing', methods=['GET'])
+def home_til():
+    temp = list(db.til.find({}, {'_id': False}).sort("_id",-1))
+    return jsonify({'result': "success", 'home_til': temp})
+
+@app.route('/home_ranking', methods=['GET'])
+def home_ranking():
+    agg_result=list(db.til.aggregate([
+        {"$group":
+            {
+                "_id": "$til_user",
+                "til_score": {"$sum": 1}
+            }
+        },
+        {"$sort":
+            {'til_score': -1}
+        }
+    ]))
+    return jsonify({'result': "success", 'home_til': agg_result})
 
 @app.route('/api/create', methods=['POST'])
 def api_create():
@@ -82,8 +90,8 @@ def api_update():
     til_content_receive = request.form['til_content_give']
     current_time = datetime.now()
 
-    doc = {'til_title': til_title_receive, 'til_content': til_content_receive, 'til_update_day': current_time}
-    db.til.update_one({'_id': til_id_receive}, doc)
+    doc = {"$set": {'til_title': til_title_receive, 'til_content': til_content_receive, 'til_update_day': current_time}}
+    db.til.update_one({'_id': ObjectId(til_id_receive)}, doc)
     return jsonify({'msg': '수정 완료!'})
 
 @app.route('/api/update/view', methods=['POST'])
