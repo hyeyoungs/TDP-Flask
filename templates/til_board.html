@@ -33,8 +33,7 @@
                             let title = all_til[i]['til_title'];
                             let user = all_til[i]['til_user'];
                             let day = all_til[i]['til_day'];
-                            let temp_html = `<tr onClick="location.href='detail'" style="cursor:pointer;">
-
+                            let temp_html = `<tr onClick="search(${title})" style="cursor:pointer;">
                                                 <th scope="row">${title}</th>
                                                 <td>${user}</td>
                                                 <td>${day}</td>
@@ -45,6 +44,14 @@
                 }
             )
         }
+
+        function search(title) {
+            alert(title)
+            location.href = "http://localhost:5000/detail"+"?title="+title;
+        }
+
+
+출처: https://queserasera.tistory.com/8 [기발한 개발노트]
 
         function til_search() {
             $('#til-table > tbody:last').empty();

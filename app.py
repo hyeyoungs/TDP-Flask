@@ -34,11 +34,10 @@ def listing_page():
 
 @app.route('/detail')
 def detail_page():
-    return render_template('detail.html')
+    title = request.args.get("title")
+    content = db.til.find_one({'til_title': title}, {'_id': False})
+    return render_template('detail.html', content=content)
 
-
-
-db.til.find({})
 # @app.route('/til_board', methods=['POST'])
 # def delete_til():
 #     til_id_receive = request.form['til_id_give']
@@ -56,9 +55,6 @@ def all_til():
     temp = list(db.til.find({}, {'_id': False}))
     return jsonify({'result': "success", 'all_til': temp})
 
-@app.route('/detail/<content>')
-def detail(content):
-    return render_template("detail.html", content=content)
 
 @app.route('/home_listing', methods=['GET'])
 def home_til():
