@@ -55,7 +55,7 @@
         )
     }
 
-     function ranking() {
+    function ranking() {
         $.ajax({
                 type: "GET",
                 url: "/home_ranking",
@@ -64,11 +64,10 @@
                     let home_til = response['home_til'];
                     for (let i = 0; i < home_til.length; i++) {
                         let user = home_til[i]['_id'];
-                        let ranker=+1;
+                        let ranker = +1;
                         let score = home_til[i]['til_score'];
-                        let temp_html = `
-           <tr>
-           <th>${ranker}</th>
+                        let temp_html = `<tr>
+                                                <th>${ranker}</th>
                                                 <th scope="row">${user}</th>
                                                 <td>${score}</td>
                                             </tr>
