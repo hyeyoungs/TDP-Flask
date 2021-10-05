@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # pc 용 :
 client = MongoClient('localhost', 27017)
-db = client.tdp
+db = client.til
 
 @app.route('/')
 def main_page():
