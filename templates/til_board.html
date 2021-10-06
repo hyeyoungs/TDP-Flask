@@ -19,10 +19,10 @@
     <script>
         $(document).ready(function () {
             listing();
-
         });
 
         function listing() {
+
             $.ajax({
                 type: "GET",
                 url: "/til_board_listing",
@@ -33,7 +33,7 @@
                             let title = all_til[i]['til_title'];
                             let user = all_til[i]['til_user'];
                             let day = all_til[i]['til_day'];
-                            let temp_html = `<tr>
+                            let temp_html = `<tr onClick="search('${title}')" style="cursor:pointer;">
                                                 <th scope="row">${title}</th>
                                                 <td>${user}</td>
                                                 <td>${day}</td>
@@ -44,35 +44,51 @@
                 }
             )
         }
-        function til_search() {
 
+        function search(title) {
+            location.href = "http://localhost:5000/detail"+"?title="+title;
+        }
+
+
+        function til_search() {
             $('#til-table > tbody:last').empty();
             let til_title = $('#search').val()
 
             $.ajax({
-                type: 'POST',
-                url: "/til_board",
+                type: "POST",
+                url: '/til_board',
                 data: {til_title: til_title},
                 success: function (response) {
-                   
                     let find_til = response['til']
                     for (let i = 0; i < find_til.length; i++) {
-                            let title = find_til[i]['til_title'];
-                            let user = find_til[i]['til_user'];
-                            let day = find_til[i]['til_day'];
-                            let temp_html = `<tr>
-                                                <th scope="row">${user}</th>
-                                                <td>${title}</td>
+                        let title = find_til[i]['til_title'];
+                        let user = find_til[i]['til_user'];
+                        let day = find_til[i]['til_day'];
+                        let temp_html = `<tr>
+                                                <th scope="row">${title}</th>
+                                                <td >${user}</td>
                                                 <td>${day}</td>
+
                                             </tr>`
-                            $('#til-box').append(temp_html)
-                        }
+                        $('#til-box').append(temp_html)
+                    }
                 }
             })
         }
-
-
     </script>
+
+    <style>
+        .wrap {
+            margin: 50px auto;
+
+        }
+
+        .input-box {
+            margin: 50px auto;
+            width: 350px;
+        }
+
+    </style>
 </head>
 
 
@@ -98,8 +114,8 @@
         <table id="til-table" class="table">
             <thead>
             <tr>
-                <th scope="col">작성자</th>
                 <th scope="col">제목</th>
+                <th scope="col">작성자</th>
                 <th scope="col">작성일</th>
             </tr>
             </thead>
