@@ -7,13 +7,18 @@ app = Flask(__name__)
 
 # pc 용 :
 client = MongoClient('localhost', 27017)
-db = client.til
+db = client.tdp
 
 
 # 위아래 두칸씩 벌려야함
 
 
 @app.route('/')
+def login_page():
+    return render_template('login_page.html')
+
+
+@app.route('/main_page')
 def main_page():
     return render_template('home.html')
 
@@ -23,9 +28,9 @@ def signup_page():
     return render_template('signup_page.html')
 
 
-@app.route('/my_page')
-def my_page():
-    return render_template('my_page.html')
+@app.route('/mytil_page')
+def mytil_page():
+    return render_template('mytil_page.html')
 
 
 @app.route('/create_page')
@@ -55,6 +60,7 @@ def detail_page():
 #     til_id_receive = request.form['til_id_give']
 #     db.til.delete_one({'_id': til_id_receive})
 #     return jsonify({'msg': '삭제 완료!'})
+
 
 @app.route('/til_board', methods=['POST'])
 def read_til():

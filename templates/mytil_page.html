@@ -200,7 +200,14 @@
                 margin-bottom: 2.77rem;
             }
         }
+    .navbar-brand {
+        margin-left: 50px;
+    }
 
+    .nav-link {
+
+        margin-left: 100px;
+    }
         /* Reset Bootstrap */
         .dropdown-toggle::after {
             content: none;
@@ -209,9 +216,24 @@
     </style>
 </head>
 <body>
+
     <!-- navigation -->
-    <nav class="navbar navbar-light bg-white">
-        <a href="home" class="navbar-brand">TIL.D.P</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">TIL.D.P</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div id="navbar-nav" class="navbar-nav">
+                <a class="nav-link " href="./til_board">Write TIL</a>
+                <a class="nav-link" href="#">My TIL</a>
+                <a class="nav-link" href="https://github.com/">Github</a>
+                <a class="nav-link" href="/">logout</a>
+            </div>
+        </div>
+    </div>
         <form class="form-inline">
             <div class="input-group">
                 <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="button-addon2">
@@ -222,7 +244,9 @@
                 </div>
             </div>
         </form>
-    </nav>
+</nav>
+
+
 
     <div class="container-fluid gedf-wrapper">
         <!-- container -->
