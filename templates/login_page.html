@@ -44,7 +44,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cfd8dc', end
 }
 
 
-.cont_centrar {
+.cont_central {
   position: relative;
   float: left;
    width: 100%;
@@ -99,7 +99,7 @@ transition: all 0.5s;
 
 .cont_forms_active_sign_up {
 box-shadow: 1px 10px 30px -10px rgba(0,0,0,0.5);
-  height: 420px;
+  height: 455px;
 top:20px;
 left:320px;
 -webkit-transition: all 0.5s;
@@ -401,7 +401,9 @@ setTimeout(function(){   document.querySelector('.cont_form_login').style.displa
 },400);
 }
 
-
+function login_js(){
+        location.href="main_page";
+}
 
 function ocultar_login_sign_up() {
 
@@ -423,7 +425,7 @@ document.querySelector('.cont_form_login').style.display = "none";
     </script>
 <body>
 <div class="cotn_principal">
-<div class="cont_centrar">
+<div class="cont_central">
 
   <div class="cont_login">
 <div class="cont_info_log_sign_up">
@@ -461,16 +463,16 @@ document.querySelector('.cont_form_login').style.display = "none";
  <div class="cont_form_login">
 <a href="#" onclick="ocultar_login_sign_up()" ><i class="material-icons">&#xE5C4;</i></a>
    <h2>LOGIN</h2>
- <input type="text" placeholder="Email" />
+ <input type="text" placeholder="ID" />
 <input type="password" placeholder="Password" />
-<button class="btn_login" onclick="cambiar_login()" >LOGIN</button>
+<button class="btn_login" onclick="login_js()" >LOGIN</button>
   </div>
 
    <div class="cont_form_sign_up">
 <a href="#" onclick="ocultar_login_sign_up()"><i class="material-icons">&#xE5C4;</i></a>
      <h2>SIGN UP</h2>
-<input type="text" placeholder="Email" />
-<input type="text" placeholder="User" />
+<input type="text" placeholder="ID" />
+<input type="text" placeholder="NickName" />
 <input type="password" placeholder="Password" />
 <input type="password" placeholder="Confirm Password" />
 <button class="btn_sign_up" onclick="cambiar_sign_up()">SIGN UP</button>

@@ -48,14 +48,14 @@
                 </div>
                   </div>
 `
-                        $('#boradmain').append(temp_html)
+                        $('#board-main').append(temp_html)
                     }
                 }
             }
         )
     }
 
-     function ranking() {
+    function ranking() {
         $.ajax({
                 type: "GET",
                 url: "/home_ranking",
@@ -64,11 +64,10 @@
                     let home_til = response['home_til'];
                     for (let i = 0; i < home_til.length; i++) {
                         let user = home_til[i]['_id'];
-                        let ranker=+1;
+                        let ranker = +1;
                         let score = home_til[i]['til_score'];
-                        let temp_html = `
-           <tr>
-           <th>${ranker}</th>
+                        let temp_html = `<tr>
+                                                <th>${ranker}</th>
                                                 <th scope="row">${user}</th>
                                                 <td>${score}</td>
                                             </tr>
@@ -93,7 +92,7 @@
         margin-left: 150px;
     }
 
-    .rankingzon {
+    .rankingzone {
         position: center;
         float: right;
         margin-right: 80px;
@@ -103,7 +102,7 @@
         margin-left: 70px;
     }
 
-    .boradmain {
+    .board-main {
         margin-left: 20px;
     }
 
@@ -111,7 +110,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">TIL.D.P</a>
+        <a class="navbar-brand" href="/">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -119,16 +118,16 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div id="navbar-nav" class="navbar-nav">
                 <a class="nav-link " href="./til_board">Write TIL</a>
-                <a class="nav-link" href="#">My TIL</a>
+                <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
-                <a class="nav-link" href="./my_page">myPage</a>
+                <a class="nav-link" href="./">myPage</a>
                 <a class="nav-link" href="/">logout</a>
             </div>
         </div>
     </div>
 </nav>
 <br><br>
-<div class="rankingzon">
+<div class="rankingzone">
     <h1> 랭킹존 </h1>
     <table>
         <thead>
@@ -153,7 +152,7 @@
 </div>
 <br>
 <br><br><br>
-<div class="row row-cols-3 row-cols-md-5 g-3 boradmain" id="boradmain">
+<div class="row row-cols-3 row-cols-md-5 g-3 board-main" id="board-main">
 
 </div>
 </div>
