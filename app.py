@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # pc 용 :
 client = MongoClient('localhost', 27017)
-db = client.til
+db = client.tdp
 
 
 # 위아래 두칸씩 벌려야함
@@ -23,9 +23,9 @@ def signup_page():
     return render_template('signup_page.html')
 
 
-@app.route('/my_page')
-def my_page():
-    return render_template('my_page.html')
+@app.route('/mytil_page')
+def mytil_page():
+    return render_template('mytil_page.html')
 
 
 @app.route('/create_page')

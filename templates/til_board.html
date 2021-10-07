@@ -24,10 +24,10 @@
         function listing() {
 
             $.ajax({
-                type: "GET",
-                url: "/til_board_listing",
-                data: {},
-                success: function (response) {
+                    type: "GET",
+                    url: "/til_board_listing",
+                    data: {},
+                    success: function (response) {
                         let all_til = response['all_til'];
                         for (let i = 0; i < all_til.length; i++) {
                             let title = all_til[i]['til_title'];
@@ -46,7 +46,7 @@
         }
 
         function search(title) {
-            location.href = "http://localhost:5000/detail"+"?title="+title;
+            location.href = "http://localhost:5000/detail" + "?title=" + title;
         }
 
 
@@ -88,28 +88,49 @@
             width: 350px;
         }
 
+        .navbar-brand {
+            margin-left: 50px;
+        }
+
+        .nav-link {
+
+            margin-left: 100px;
+        }
+
+
     </style>
 </head>
 
 
 <body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">TIL.D.P</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div id="navbar-nav" class="navbar-nav">
+                <a class="nav-link" href="./mytil_page">My TIL</a>
+                <a class="nav-link" href="https://github.com/">Github</a>
+                <a class="nav-link" href="/">myPage</a>
+                <a class="nav-link" href="/">logout</a>
+            </div>
+        </div>
+    </div>
+</nav>
 <div class="container">
     <table class="table">
         <thead class="thead-light">
         <tr class="text-center">
             <th scope="col">TIL LIST</th>
+        </tr>
+        </thead>
+    </table>
 </div>
 
 <div class="wrap">
-    <div class="input-box">
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon1">제목</span>
-            </div>
-            <input id="search" type="text" class="form-control" placeholder="검색어를 입력해주세요" aria-label="Username">
-            <button onclick="til_search()" type="button" id="btn-search" class="btn btn-primary">검색</button>
-        </div>
-    </div>
     <div class="container">
         <table id="til-table" class="table">
             <thead>
@@ -122,13 +143,18 @@
             <tbody id="til-box">
             </tbody>
         </table>
-        <div class="row">
-            <div class="col-auto mr-auto"></div>
-            <div class="col-auto">
-                <a class="btn btn-primary" href="create_page" role="button">글쓰기</a>
+        <a class="btn btn-primary" href="create_page" role="button">글쓰기</a>
+                <div class="input-box">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">제목</span>
+                        </div>
+                        <input id="search" type="text" class="form-control" placeholder="검색어를 입력해주세요"
+                               aria-label="Username">
+                        <button onclick="til_search()" type="button" id="btn-search" class="btn btn-primary">검색</button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
 </div>
 </body>
