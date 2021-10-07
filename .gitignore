@@ -142,6 +142,7 @@ fabric.properties
 Thumbs.db
 Thumbs.db:encryptable
 ehthumbs.db
+.idea/*
 ehthumbs_vista.db
 
 # Dump file
