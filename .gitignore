@@ -7,6 +7,7 @@
 .DS_Store
 .AppleDouble
 .LSOverride
+venv/*
 
 # Icon must end with two \r
 Icon
@@ -142,6 +143,7 @@ fabric.properties
 Thumbs.db
 Thumbs.db:encryptable
 ehthumbs.db
+.idea/*
 ehthumbs_vista.db
 
 # Dump file
