@@ -14,6 +14,11 @@ db = client.tdp
 
 
 @app.route('/')
+def login_page():
+    return render_template('login_page.html')
+
+
+@app.route('/main_page')
 def main_page():
     return render_template('home.html')
 
