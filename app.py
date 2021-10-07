@@ -56,6 +56,7 @@ def detail_page():
 #     db.til.delete_one({'_id': til_id_receive})
 #     return jsonify({'msg': '삭제 완료!'})
 
+
 @app.route('/til_board', methods=['POST'])
 def read_til():
     til_title_receive = request.form['til_title']
