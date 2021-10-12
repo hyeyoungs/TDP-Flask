@@ -46,7 +46,7 @@ def home():
 
 
 @app.route('/til_board')
-def listing_page():
+def list_page():
     return render_template('til_board.html')
 
 
@@ -55,20 +55,6 @@ def detail_page():
     title = request.args.get("title")
     content = db.til.find_one({'til_title': title}, {'_id': False})
     return render_template('detail.html', content=content)
-
-
-# @app.route('/til_board', methods=['POST'])
-# def delete_til():
-#     til_id_receive = request.form['til_id_give']
-#     db.til.delete_one({'_id': til_id_receive})
-#     return jsonify({'msg': '삭제 완료!'})
-
-
-# @app.route('/til_board', methods=['POST'])
-# def read_til():
-#     til_title_receive = request.form['til_title']
-#     temp = list(db.til.find({'til_title': til_title_receive}, {'_id': False}))
-#     return jsonify({'til': temp})
 
 
 @app.route('/til_board_listing', methods=['GET'])
