@@ -167,7 +167,7 @@
         function update_view(idx){
             $.ajax({
                 type: "PUT",
-                url: "/til/view/${idx}",
+                url: `/til/view/${idx}`,
                 data: {},
                 success: function (response){
                     alert(response["msg"]);

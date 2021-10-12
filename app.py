@@ -13,7 +13,6 @@ SECRET_KEY = 'CodingDeserterPursuit'
 import jwt
 import datetime
 import hashlib
-# 위아래 두칸씩 벌려야함
 
 
 @app.route('/')
@@ -143,13 +142,15 @@ def update_til(idx):
 
 @app.route('/til/view/<idx>', methods=['PUT'])
 def update_view(idx):
-    til_view = db.til.find_one({'til_idx': int(idx)}, {"til_idx": 0, "til_view": 1})
-    view_value = til_view["til_view"]
+    doc = db.til.find_one({'til_idx': int(idx)})
+    view_value = doc["til_view"]
+
     if not isinstance(view_value, bool):
         msg = '공개 여부의 값이 정확하지 않습니다.'
     else:
         doc = {"$set": {'til_view': not (view_value)}}
-        db.til.update_one({'til_idx': idx}, doc)
+        print(idx, doc)
+        db.til.update_one({'til_idx': int(idx)}, doc)
 
     msg = '변경 완료!'
     return jsonify({'msg': msg})
