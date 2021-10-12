@@ -77,7 +77,7 @@ def all_til():
     return jsonify({'result': "success", 'all_til': temp})
 
 
-@app.route('/til/user', methods=['POST'])
+@app.route('/user/til', methods=['POST'])
 def read_my_til():
     til_user_receive = request.form['til_user_give']
     my_til = list(db.til.find({'til_user': til_user_receive}, {'_id': False}).sort('_id', -1))
@@ -122,6 +122,11 @@ def create_til():
     db.til.insert_one(doc)
     return jsonify({'msg': 'til 작성 완료!'})
 
+@app.route('/til', methods=['GET'])
+def get_post():
+    idx = request.args['idx']
+    doc = db.til.find_one({'til_idx': int(idx)}, {'_id': False})
+    return jsonify({"til": doc})
 
 @app.route('/til/<idx>', methods=['DELETE'])
 def delete_til(idx):
@@ -134,7 +139,6 @@ def update_til(idx):
     til_title_receive = request.form['til_title_give']
     til_content_receive = request.form['til_content_give']
     current_time = datetime.datetime.now()
-
     doc = {"$set": {'til_title': til_title_receive, 'til_content': til_content_receive, 'til_update_day': current_time}}
     db.til.update_one({'til_idx': int(idx)}, doc)
     return jsonify({'msg': '수정 완료!'})
