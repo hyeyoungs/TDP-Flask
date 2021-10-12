@@ -39,13 +39,13 @@
                         let day = home_til[i]['til_day'];
                         let temp_html = `
                 <div class="col" id="cards-box">
-               <div class="card">
-                <h5 class="card-subtitle">${user}</h5>
-               <div class="card-body">
-                <h5 class="card-title">${title}</h5>
-                <p class="card-text">${content}</p>
-                <p class="card-time">${day} </p>
-                </div>
+                   <div class="card">
+                    <h5 class="card-subtitle">${user}</h5>
+                   <div class="card-body">
+                    <h5 class="card-title">${title}</h5>
+                    <p class="card-text">${content}</p>
+                    <p class="card-time">${day} </p>
+                    </div>
                   </div>
 `
                         $('#board-main').append(temp_html)
@@ -81,6 +81,11 @@
         )
     }
 
+    function sign_out() {
+        $.removeCookie('mytoken', {path: '/'});
+        alert('로그아웃!')
+        window.location.href = "/main_page"
+    }
 </script>
 <style>
     .navbar-brand {
