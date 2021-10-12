@@ -53,6 +53,43 @@ def listing_page():
     return render_template('til_board.html')
 
 
+@app.route('/detail')
+def detail_page():
+    # token_receive = request.cookies.get('mytoken')
+
+    doc = { "username": '이진권',
+            "user_id": 'lee',
+            "user_nickname": 'jinkwon',
+            "user_followers": 6,
+            "user_followings": 7}
+    db.user.insert_one(doc)
+    til_idx = request.args.get("til_idx")
+    content = db.til.find_one({'til_idx': til_idx}, {'_id': False})
+    user_info = db.user.find_one({"username": '이진권'})
+    return render_template('detail.html', user_info=user_info, content=content)
+
+    # try:
+    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    #     user_info = db.user.find_one({"username": payload["id"]})
+    #     return render_template('detail.html', user_info=user_info, content=content)
+    # except jwt.ExpiredSignatureError:
+    #     return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
+    # except jwt.exceptions.DecodeError:
+    #     return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+
+
+@app.route('/til/comment', methods=['POST'])
+def detail_comment():
+    comment_receive = request.form['comment_give']
+    date_receive = request.form['date_give']
+
+    doc = {'til_comment': comment_receive, 'til_comment_day': date_receive}
+
+    db.comment.insert_one(doc)
+    msg = "댓글작성 완료"
+    return jsonify({'msg': msg})
+
+
 @app.route('/til_board_detail')
 def search_detail_page():
     keyword = request.args.get("keyword")
@@ -63,7 +100,7 @@ def search_detail_page():
         setting = 'til_user'
     else:
         setting = 'til_content'
-    temp = list(db.tdp.find({setting: keyword}, {'_id': False}))
+    temp = list(db.til.find({setting: keyword}, {'_id': False}))
     return render_template("til_board_detail.html", til=temp)
 
 
@@ -85,7 +122,7 @@ def search_til():
     else:
         setting = 'til_content'
 
-    temp = list(db.tdp.find({setting: keyword}, {'_id': False}))
+    temp = list(db.til.find({setting: keyword}, {'_id': False}))
     return jsonify({'til': temp})
 
 
@@ -93,6 +130,8 @@ def search_til():
 def all_til():
     temp = list(db.til.find({}, {'_id': False}))
     return jsonify({'result': "success", 'all_til': temp})
+
+
 
 
 @app.route('/api/list_myTIL', methods=['POST'])

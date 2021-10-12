@@ -17,15 +17,18 @@
             crossorigin="anonymous"></script>
 
     <script>
+
         $(document).ready(function () {
             listing();
         });
 
         function listing() {
 
+
             $.ajax({
                 type: "GET",
                 url: "/til_board_listing",
+
                 data: {},
                 success: function (response) {
                         let all_til = response['all_til'];
@@ -34,11 +37,12 @@
                             let user = all_til[i]['til_user'];
                             let content = all_til[i]['til_content'];
                             let day = all_til[i]['til_day'];
-                            let temp_html = `<tr onClick="detail('${title}')" style="cursor:pointer;">
+                            let til_idx = all_til[i]['til_idx']
+                            let temp_html = `<tr onClick="detail('${til_idx}')" style="cursor:pointer;">
                                                 <th scope="row">${title}</th>
                                                 <td>${user}</td>
-                                                <td>${content}</td>
                                                 <td>${day}</td>
+                                                <td>${content}</td>
                                             </tr>`
                             $('#til-box').append(temp_html)
                         }
@@ -48,8 +52,8 @@
         }
 
 
-        function detail(title) {
-            location.href = "http://localhost:5000/detail"+"?title="+title;
+        function detail(til_idx) {
+            location.href = "http://localhost:5000/detail"+"?til_idx="+til_idx;
         }
 
 
