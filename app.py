@@ -20,6 +20,11 @@ def login_page():
     return render_template('login_page.html')
 
 
+@app.route('/main_page')
+def main_page():
+    return render_template('home.html')
+
+
 @app.route('/signup_page')
 def signup_page():
     return render_template('signup_page.html')
@@ -52,10 +57,11 @@ def detail_page():
     return render_template('detail.html', content=content)
 
 
-@app.route('/til_board_listing', methods=['GET'])
-def all_til():
+@app.route('/til/board', methods=['GET'])
+def read_all_til():
     temp = list(db.til.find({}, {'_id': False}))
-    return jsonify({'result': "success", 'all_til': temp})
+    til_count = db.til.count()
+    return jsonify({'result': "success", 'all_til': temp, "til_count": til_count})
 
 
 @app.route('/user/til', methods=['POST'])
@@ -65,14 +71,8 @@ def read_my_til():
     return jsonify({'result': 'success', 'my_til': my_til})
 
 
-@app.route('/home_listing', methods=['GET'])
-def home_til():
-    temp = list(db.til.find({}, {'_id': False}).sort("_id", -1))
-    return jsonify({'result': "success", 'home_til': temp})
-
-
-@app.route('/home_ranking', methods=['GET'])
-def home_ranking():
+@app.route('/til/rank', methods=['GET'])
+def rank_til():
     agg_result = list(db.til.aggregate([
         {"$group":
             {
@@ -84,7 +84,7 @@ def home_ranking():
              {'til_score': -1}
          }
     ]))
-    return jsonify({'result': "success", 'home_til': agg_result})
+    return jsonify({'result': "success", 'til_rank': agg_result})
 
 
 @app.route('/til', methods=['POST'])
@@ -103,11 +103,13 @@ def create_til():
     db.til.insert_one(doc)
     return jsonify({'msg': 'til 작성 완료!'})
 
+
 @app.route('/til', methods=['GET'])
-def get_post():
+def get_til():
     idx = request.args['idx']
     doc = db.til.find_one({'til_idx': int(idx)}, {'_id': False})
     return jsonify({"til": doc})
+
 
 @app.route('/til/<idx>', methods=['DELETE'])
 def delete_til(idx):
