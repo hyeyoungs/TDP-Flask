@@ -53,11 +53,18 @@ def listing_page():
     return render_template('til_board.html')
 
 
-@app.route('/detail')
-def detail_page():
-    title = request.args.get("title")
-    content = db.til.find_one({'til_title': title}, {'_id': False})
-    return render_template('detail.html', content=content)
+@app.route('/til_board_detail')
+def search_detail_page():
+    keyword = request.args.get("keyword")
+    setting = request.args.get("setting")
+    if setting == '제목':
+        setting = 'til_title'
+    elif setting == '작성자':
+        setting = 'til_user'
+    else:
+        setting = 'til_content'
+    temp = list(db.tdp.find({setting: keyword}, {'_id': False}))
+    return render_template("til_board_detail.html", til=temp)
 
 
 # @app.route('/til_board', methods=['POST'])
@@ -68,9 +75,17 @@ def detail_page():
 
 
 @app.route('/til_board', methods=['POST'])
-def read_til():
-    til_title_receive = request.form['til_title']
-    temp = list(db.til.find({'til_title': til_title_receive}, {'_id': False}))
+def search_til():
+    keyword = request.form['keyword_give']
+    setting = request.form['setting_give']
+    if setting == '제목':
+        setting = 'til_title'
+    elif setting == '작성자':
+        setting = 'til_user'
+    else:
+        setting = 'til_content'
+
+    temp = list(db.tdp.find({setting: keyword}, {'_id': False}))
     return jsonify({'til': temp})
 
 
