@@ -68,10 +68,9 @@
                     let til_rank = response['til_rank'];
                     for (let i = 0; i < til_rank.length; i++) {
                         let user = til_rank[i]['_id'];
-                        let ranker = +1;
                         let score = til_rank[i]['til_score'];
                         let temp_html = `<tr>
-                                                <th>${ranker}</th>
+                                                <th>${i+1}</th>
                                                 <th scope="row">${user}</th>
                                                 <td>${score}</td>
                                             </tr>
