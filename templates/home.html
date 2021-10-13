@@ -21,11 +21,14 @@
 <script>
 
     $(document).ready(function () {
-        stop_auth();
         listing();
         ranking();
     });
     function stop_atuh() {
+        $.ajax({
+            type:"GET",
+            url: "nick"
+        })
     }
     function listing() {
         $.ajax({
