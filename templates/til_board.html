@@ -19,16 +19,13 @@
     <script>
 
         $(document).ready(function () {
-            listing();
+            read_all_til();
         });
 
-        function listing() {
-
-
+        function read_all_til() {
             $.ajax({
                 type: "GET",
                 url: "/til_board_listing",
-
                 data: {},
                 success: function (response) {
                         let all_til = response['all_til'];

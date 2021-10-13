@@ -64,9 +64,9 @@ def detail_page():
             "user_followings": 7}
     db.user.insert_one(doc)
     til_idx = request.args.get("til_idx")
-    content = db.til.find_one({'til_idx': til_idx}, {'_id': False})
+    til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
     user_info = db.user.find_one({"username": '이진권'})
-    return render_template('detail.html', user_info=user_info, content=content)
+    return render_template('detail.html', user_info=user_info, til=til)
 
     # try:
     #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
@@ -79,15 +79,32 @@ def detail_page():
 
 
 @app.route('/til/comment', methods=['POST'])
-def detail_comment():
+def create_comment():
     comment_receive = request.form['comment_give']
     date_receive = request.form['date_give']
+    til_idx_receive = request.form['til_idx_give']
 
-    doc = {'til_comment': comment_receive, 'til_comment_day': date_receive}
+    doc = {'til_idx': til_idx_receive, 'til_comment': comment_receive, 'til_comment_day': date_receive}
 
     db.comment.insert_one(doc)
     msg = "댓글작성 완료"
     return jsonify({'msg': msg})
+
+
+@app.route('/til/comment', methods=['GET'])
+def read_comment():
+
+    temp = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
+    temp['_id'] = str(temp['_id'])
+    return jsonify({'result': "success", 'comment': temp})
+
+
+@app.route('/til/comment', methods=['POST'])
+def delete_comment():
+    til_idx = request.args.get("til_idx")
+    temp = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
+    return jsonify({'result': "success", 'comment': temp, 'msg': '삭제 완료'})
+
 
 
 @app.route('/til_board_detail')

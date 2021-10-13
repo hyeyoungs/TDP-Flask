@@ -29,21 +29,62 @@
 
     <script>
 
+
+
         function create_comment() {
             let comment = $("#textarea-post").val()
             let today = new Date().toISOString()
-            // let til_idx = $("#til_idx").val()
+            let til_idx = $("#idx").text()
+            // let writer =
             $.ajax({
                 type: "POST",
                 url: "/til/comment",
                 data: {
                     comment_give: comment,
                     date_give: today,
-                    // til_idx_give : til_idx
+                    til_idx_give : til_idx
                 },
                 success: function (response) {
                     alert(response['msg'])
                     $("#modal-post").removeClass("is-active")
+                    window.location.reload()
+                }
+            })
+        }
+        function read_comment() {
+            $.ajax({
+                type: "GET",
+                url: "/til/comment",
+                data: {},
+                success: function (response) {
+                        let comment = response['comment'];
+                        for (let i = 0; i < comment.length; i++) {
+                            // let writer
+                            let comment = comment[i]['til_comment'];
+                            let day = comment[i]['til_comment_day'];
+                            let _id = comment[i]['_id'];
+                            let temp_html = `<tr>
+                                                <th id="${_id}" value="${_id}" scope="row"></th>
+                                                <td>${comment}</td>
+                                                <td>${day}</td>
+                                                <td><button type="button" onclick="delete_comment('${_id}')" class="btn btn-primary">삭제</button></td>
+                                            </tr>`
+                            $('#comment-box').append(temp_html)
+                        }
+                    }
+                }
+            )
+        }
+        function delete_comment(_id) {
+
+            $.ajax({
+                type: "POST",
+                url: "/til/comment",
+                data: {
+                    comment_id_give: _id,
+                },
+                success: function (response) {
+                    alert(response['msg'])
                     window.location.reload()
                 }
             })
@@ -159,12 +200,24 @@
                 <div class="top" value="til_idx">
                     <div class="avatar"><img src="https://placehold.it/128x128"></div>
                     <div class="address">
-                        <div class="name">{{title}}</div>
-                        <div class="email">{{nickname}}</div>
+                        <div class="name">{{til.til_title}}</div>
+                        <div class="writer">{{writer}}</div>
                     </div>
                     <hr>
                     <div class="content">
-                        <p>{{content}}</p>
+                        <p id="idx">{{til.til_idx}}</p>
+                        <p>{{til.til_content}}</p>
+                    </div>
+                    <div>
+                        <table id="til-table" class="table">
+                            <thead>
+                            <tr>
+                                <th scope="col">작성자</th>
+                            </tr>
+                            </thead>
+                            <tbody id="til-box">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
                 <section class="section">
