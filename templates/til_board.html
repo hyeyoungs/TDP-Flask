@@ -28,13 +28,24 @@
                 url: "/til_board_listing",
                 data: {},
                 success: function (response) {
-                        let all_til = response['all_til'];
-                        for (let i = 0; i < all_til.length; i++) {
-                            let title = all_til[i]['til_title'];
-                            let user = all_til[i]['til_user'];
-                            let content = all_til[i]['til_content'];
-                            let day = all_til[i]['til_day'];
-                            let til_idx = all_til[i]['til_idx']
+                    let all_til = response['all_til'];
+                    for (let i = 0; i < all_til.length; i++) {
+                        let title = all_til[i]['til_title'];
+                        let user = all_til[i]['til_user'];
+                        let content = all_til[i]['til_content'];
+                        let day = all_til[i]['til_day'];
+                        let til_idx = all_til[i]['til_idx']
+                        if (i < 7) {
+                            let temp_html = `<tr onClick="detail('${til_idx}')" style="cursor:pointer;">
+                                                <th scope="row">${title}<img src="{{ url_for('static', filename='new.png') }}" height="30" width="30"></th>
+                                                <td>${user}</td>
+                                                <td>${day}</td>
+                                                <td>${content}</td>
+                                            </tr>`
+
+                            $('#til-box').append(temp_html)
+
+                        } else {
                             let temp_html = `<tr onClick="detail('${til_idx}')" style="cursor:pointer;">
                                                 <th scope="row">${title}</th>
                                                 <td>${user}</td>
@@ -43,6 +54,9 @@
                                             </tr>`
                             $('#til-box').append(temp_html)
                         }
+
+
+                    }
                     }
                 }
             )

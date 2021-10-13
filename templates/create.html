@@ -42,17 +42,18 @@
             e.preventDefault();
             $("#form").submit();
         });
-        function makeTIL() {
+        function create_til() {
             let title = $('#title').val()
             let user = $('#reg_id').val()
             let content = $('#content').val()
 
             $.ajax({
                 type: "POST",
-                url: "/api/create",
+                url: "/til",
                 data: {til_user_give: user, til_title_give: title, til_content_give: content},
                 success: function (response) { // 성공하면
-                    location.href="til_board";
+                    console.log("success");
+                    location.href="/til_board";
                 }
             })
         }
@@ -68,7 +69,7 @@
 	<article>
 		<div class="container" role="main">
 			<h2>board Form</h2>
-			<form name="form" id="form" role="form" method="post" action="./til_board">
+			<form name="form" id="form" role="form">
 				<div class="mb-3">
 					<label for="title">제목</label>
 					<input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력해 주세요">
@@ -88,7 +89,7 @@
 				</div>
 			</form>
 			<div>
-				<button onclick="makeTIL()" type="button" class="btn btn-sm btn-primary" id="btnSave">저장</button>
+				<button onclick="create_til()" type="button" class="btn btn-sm btn-primary" id="btnSave">저장</button>
 				<button type="button" class="btn btn-sm btn-primary" id="btnList">목록</button>
 			</div>
 		</div>
