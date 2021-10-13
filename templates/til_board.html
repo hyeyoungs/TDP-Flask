@@ -19,14 +19,14 @@
 
     <script>
         $(document).ready(function () {
-            listing();
+            list_til_board();
         });
 
-        function listing() {
+        function list_til_board() {
 
             $.ajax({
                     type: "GET",
-                    url: "/til_board_listing",
+                    url: "/til/board",
                     data: {},
                     success: function (response) {
                         let all_til = response['all_til'];

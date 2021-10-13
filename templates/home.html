@@ -21,22 +21,26 @@
 <script>
 
     $(document).ready(function () {
-        listing();
-        ranking();
+        list_til();
+        rank_til();
     });
 
-    function listing() {
+    function list_til() {
         $.ajax({
                 type: "GET",
-                url: "/home_listing",
+                url: "/til/board",
                 data: {},
                 success: function (response) {
-                    let home_til = response['home_til'];
-                    for (let i = 0; i < 4; i++) {
-                        let title = home_til[i]['til_title'];
-                        let user = home_til[i]['til_user'];
-                        let content = home_til[i]['til_content'];
-                        let day = home_til[i]['til_day'];
+                    let all_til = response['all_til'];
+                    let max = 4;
+                    if (response['til_count'] < 4) {
+                        max = response['til_count']
+                    }
+                    for (let i = 0; i < max; i++) {
+                        let title = all_til[i]['til_title'];
+                        let user = all_til[i]['til_user'];
+                        let content = all_til[i]['til_content'];
+                        let day = all_til[i]['til_day'];
                         let temp_html = `
                 <div class="col" id="cards-box">
                    <div class="card">
@@ -55,19 +59,18 @@
         )
     }
 
-    function ranking() {
+    function rank_til() {
         $.ajax({
                 type: "GET",
-                url: "/home_ranking",
+                url: "/til/rank",
                 data: {},
                 success: function (response) {
-                    let home_til = response['home_til'];
-                    for (let i = 0; i < home_til.length; i++) {
-                        let user = home_til[i]['_id'];
-                        let ranker = +1;
-                        let score = home_til[i]['til_score'];
+                    let til_rank = response['til_rank'];
+                    for (let i = 0; i < til_rank.length; i++) {
+                        let user = til_rank[i]['_id'];
+                        let score = til_rank[i]['til_score'];
                         let temp_html = `<tr>
-                                                <th>${ranker}</th>
+                                                <th>${i+1}</th>
                                                 <th scope="row">${user}</th>
                                                 <td>${score}</td>
                                             </tr>
