@@ -7,8 +7,6 @@ assignees: ''
 
 ---
 
-
-
 ## Describe the bug
 <!-- A clear and concise description of what the bug is. -->
 <!-- 발생한 bug에 대한 설명 -->
@@ -48,5 +46,3 @@ assignees: ''
 
 ## Additional context
 <!-- Add any other context about the problem here. -->
-
-
