@@ -29,7 +29,7 @@
 
     <script>
         $(document).ready(function () {
-            time2str();
+            $('#new-box').hide();
         });
 
         function create_comment() {
@@ -37,20 +37,20 @@
             let today = new Date().toISOString()
             {#let writer = payload[]#}
             let til_idx = {{til.til_idx}}
-            $.ajax({
-                type: "POST",
-                url: "/til/comment",
-                data: {
-                    comment_give: comment,
-                    date_give: today,
-                    til_idx_give: til_idx
-                },
-                success: function (response) {
-                    alert(response['msg'])
-                    $("#modal-post").removeClass("is-active")
-                    window.location.reload()
-                }
-            })
+                $.ajax({
+                    type: "POST",
+                    url: "/til/comment",
+                    data: {
+                        comment_give: comment,
+                        date_give: today,
+                        til_idx_give: til_idx
+                    },
+                    success: function (response) {
+                        alert(response['msg'])
+                        $("#modal-post").removeClass("is-active")
+                        window.location.reload()
+                    }
+                })
         }
 
         function delete_comment(idx) {
@@ -72,34 +72,28 @@
 
         function delete_til(idx) {
             $.ajax({
-                type: "POST",
-                url: "/api/delete",
-                data: {
-                    til_idx_give: idx,
-                },
+                type: "DELETE",
+                url: `/til/${idx}`,
                 success: function (response) {
-                    alert(response['msg'])
-                    window.history.back()
+                    alert(response["msg"]);
+                    window.history.back();
                 }
-            })
+            });
         }
 
 
         function update_til(idx) {
-
+            let til_title = $('#new-til-title').val();
+            let til_content = $('#new-til-content').val();
             $.ajax({
-                type: "POST",
-                url: "/api/update",
-                data: {
-                    til_idx_give: idx,
-                    til_tiltle_give:
-                    til_content_give:
-                },
+                type: "PUT",
+                url: `/til/${idx}`,
+                data: {til_title_give: til_title, til_content_give: til_content},
                 success: function (response) {
-                    alert(response['msg'])
-                    window.history.back()
+                    alert(response["msg"]);
+                    window.location.reload();
                 }
-            })
+            });
         }
 
         function time2str(date) {
@@ -120,6 +114,51 @@
             return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
         }
 
+        function new_box() {
+            $('#new-box').show();
+        }
+
+        function cancle() {
+            $('#new-box').hide();
+        }
+
+        function toggle_like(post_id, type) {
+            console.log(post_id, type)
+            let $a_like = $(`#${post_id} a[aria-label='heart']`)
+            let $i_like = $a_like.find("i")
+            if ($i_like.hasClass("fa-heart")) {
+                $.ajax({
+                    type: "POST",
+                    url: "/update_like",
+                    data: {
+                        post_id_give: post_id,
+                        type_give: type,
+                        action_give: "unlike"
+                    },
+                    success: function (response) {
+                        console.log("unlike")
+                        $i_like.addClass("fa-heart-o").removeClass("fa-heart")
+                        $a_like.find("span.like-num").text(response["count"])
+                    }
+                })
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "/update_like",
+                    data: {
+                        post_id_give: post_id,
+                        type_give: type,
+                        action_give: "like"
+                    },
+                    success: function (response) {
+                        console.log("like")
+                        $i_like.addClass("fa-heart").removeClass("fa-heart-o")
+                        $a_like.find("span.like-num").text(response["count"])
+                    }
+                })
+
+            }
+        }
 
     </script>
 
@@ -161,10 +200,16 @@
             content: none;
             display: none;
         }
-        .section{
+
+        .section {
             float: right;
         }
-        .two-button{
+
+        .two-button {
+            float: right;
+        }
+
+        .like {
             float: right;
         }
     </style>
@@ -235,22 +280,38 @@
                 <div class="top" value="til_idx">
                     <div class="avatar"><img src="https://placehold.it/128x128"></div>
                     <div class="address">
-                        <p id="idx">{{til.til_idx}}<span class="two-button"><button type="button" onclick='update_til({{ til.til_idx }})' class="btn btn-primary">수정</button><button type="button" onclick='delete_til({{ til.til_idx }})' class="btn btn-primary">삭제</button></span></p>
-                        <div class="name">{{til.til_title}}</div>
-                        <div class="writer">{{user_info.user_nickname}}</div>
+                        <p id="idx">{{ til.til_idx }}<span class="two-button"><button type="button" onclick='new_box()'
+                                                                                      class="btn btn-primary">수정</button><button
+                                type="button" onclick='delete_til({{ til.til_idx }})'
+                                class="btn btn-primary">삭제</button></span></p>
+                        <div class="name">{{ til.til_title }}</div>
+                        <div class="writer">{{ user_info.user_nickname }}</div>
 
                     </div>
                     <hr>
                     <div class="content">
-                        <p>{{til.til_content}}</p>
-                        <p>{{til.til_day}}</p>
+                        <p id="til_content">{{ til.til_content }}</p>
+                        <div id="new-box" class="form-group">
 
+                            <label for="exampleFormControlInput1">제목</label>
+                            <p><textarea class="form-control" id="new-til-title" rows="1">{{ til.til_title }}</textarea>
+                            </p>
+                            <textarea class="form-control" id="new-til-content"
+                                      rows="8">{{ til.til_content }}</textarea>
+                            <p id="new-content-button"><span class="two-button"><button type="button"
+                                                                                        onclick='update_til({{ til.til_idx }})'
+                                                                                        class="btn btn-primary">변경</button><button
+                                    type="button" onclick='cancle()' class="btn btn-primary">취소</button></span></p>
+
+                        </div>
+                        <p>{{ til.til_day }}</p>
+                        <button type="button" onclick='til_like()' class="btn btn-primary like">좋아요</button>
                     </div>
                     <div>
                         <table id="til-table" class="table">
                             <thead>
                             <tr>
-{#                                <th scope="col">작성자</th>#}
+                                {#                                <th scope="col">작성자</th>#}
                             </tr>
                             </thead>
                             <tbody id="til-box">
@@ -259,7 +320,11 @@
                                     <td>{{ now.comment_writer }}</td>
                                     <td>{{ now.til_comment }}</td>
                                     <td>{{ now.til_comment_day }}</td>
-                                    <td><button type="button" onclick='delete_comment({{ now.comment_idx }})' class="btn btn-primary">삭제</button></td>
+                                    <td>
+                                        <button type="button" onclick='delete_comment({{ now.comment_idx }})'
+                                                class="btn btn-primary">삭제
+                                        </button>
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -273,7 +338,10 @@
                         <div class="media-content">
                             <div class="field">
                                 <p class="control">
-                                <button type="button" id="input-post" onclick='$("#modal-post").addClass("is-active")' class="btn btn-primary">댓글달기</button>
+                                    <button type="button" id="input-post"
+                                            onclick='$("#modal-post").addClass("is-active")' class="btn btn-primary">
+                                        댓글달기
+                                    </button>
                             </div>
                         </div>
                     </article>

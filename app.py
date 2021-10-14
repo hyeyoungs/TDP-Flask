@@ -51,10 +51,15 @@ def list_page():
 
 
 @app.route('/detail')
-def detail_page():
-    title = request.args.get("title")
-    content = db.til.find_one({'til_title': title}, {'_id': False})
-    return render_template('detail.html', content=content)
+def read_detail():
+    # token_receive = request.cookies.get('mytoken')
+
+    til_idx = request.args.get("til_idx")
+    til_idx = int(til_idx)
+    til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
+    comment = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
+    user_info = db.user.find_one({"username": '이진권'})
+    return render_template('detail.html', user_info=user_info, til=til, comment=comment)
 
 
 @app.route('/til/board', methods=['GET'])
@@ -99,9 +104,33 @@ def create_til():
         max_value = db.til.find_one(sort=[("til_idx", -1)])['til_idx'] + 1
     db.til.count()
     doc = {'til_idx': max_value, 'til_title': til_title_receive, 'til_user': til_user_receive, 'til_content': til_content_receive,
-           'til_day': datetime.datetime.now(), 'til_view': True}
+           'til_day': datetime.datetime.now(), 'til_view': True, 'til_like': 0}
     db.til.insert_one(doc)
     return jsonify({'msg': 'til 작성 완료!'})
+
+
+@app.route('/til/comment', methods=['POST'])
+def create_comment():
+    comment_receive = request.form['comment_give']
+    date_receive = request.form['date_give']
+    til_idx_receive = request.form['til_idx_give']
+    til_idx_receive = int(til_idx_receive)
+    # writer_receive = request.form['writer_give']
+    comment_count = db.comment.count()
+    if comment_count == 0:
+        max_value = 1
+    else:
+        max_value = db.comment.find_one(sort=[("comment_idx", -1)])['comment_idx'] + 1
+    doc = {
+        # 'comment_writer': writer_receive,
+        'comment_idx': max_value,
+        'til_idx': til_idx_receive,
+        'til_comment': comment_receive,
+        'til_comment_day': date_receive
+    }
+    db.comment.insert_one(doc)
+    msg = "댓글작성 완료"
+    return jsonify({'msg': msg})
 
 
 @app.route('/til', methods=['GET'])
@@ -115,6 +144,28 @@ def get_til():
 def delete_til(idx):
     db.til.delete_one({'til_idx': int(idx)})
     return jsonify({'msg': 'til 삭제 완료!'})
+
+
+@app.route('/til/comment', methods=['DELETE'])
+def delete_comment():
+    comment_idx_receive = request.form['comment_idx_give']
+    comment_idx_receive = int(comment_idx_receive)
+    db.comment.delete_one({'comment_idx': comment_idx_receive})
+    return jsonify({'result': "success", 'msg': '삭제 완료'})
+
+
+@app.route('/til_board_detail')
+def search_detail_page():
+    keyword = request.args.get("keyword")
+    setting = request.args.get("setting")
+    if setting == '제목':
+        setting = 'til_title'
+    elif setting == '작성자':
+        setting = 'til_user'
+    else:
+        setting = 'til_content'
+    temp = list(db.til.find({setting: keyword}, {'_id': False}))
+    return render_template("til_board_detail.html", til=temp)
 
 
 @app.route('/til/<idx>', methods=['PUT'])
@@ -179,7 +230,6 @@ def login():
 @app.route('/nick', methods=['GET'])
 def api_valid():
     token_receive = request.cookies.get('mytoken')
-
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
