@@ -29,7 +29,7 @@
 
     <script>
         $(document).ready(function () {
-            read_comment();
+            time2str();
         });
 
         function create_comment() {
@@ -69,18 +69,55 @@
             })
         }
 
-        function delete_til() {
+
+        function delete_til(idx) {
             $.ajax({
-                type: "DELETE",
-                url: "/til/comment",
+                type: "POST",
+                url: "/api/delete",
                 data: {
-                    comment_idx_give: idx,
+                    til_idx_give: idx,
                 },
                 success: function (response) {
                     alert(response['msg'])
-                    window.location.reload()
+                    window.history.back()
                 }
             })
+        }
+
+
+        function update_til(idx) {
+
+            $.ajax({
+                type: "POST",
+                url: "/api/update",
+                data: {
+                    til_idx_give: idx,
+                    til_tiltle_give:
+                    til_content_give:
+                },
+                success: function (response) {
+                    alert(response['msg'])
+                    window.history.back()
+                }
+            })
+        }
+
+        function time2str(date) {
+            let today = new Date()
+            let time = (today - date) / 1000 / 60  // 분
+
+            if (time < 60) {
+                return parseInt(time) + "분 전"
+            }
+            time = time / 60  // 시간
+            if (time < 24) {
+                return parseInt(time) + "시간 전"
+            }
+            time = time / 24
+            if (time < 7) {
+                return parseInt(time) + "일 전"
+            }
+            return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
         }
 
 
@@ -127,6 +164,9 @@
         .section{
             float: right;
         }
+        .two-button{
+            float: right;
+        }
     </style>
 </head>
 <body>
@@ -149,10 +189,6 @@
             </div>
         </div>
     </div>
-    {{ user_info }}
-    {{ til }}
-    comment
-    {{ comment }}
 
     <form class="form-inline">
         <div class="input-group">
@@ -199,14 +235,16 @@
                 <div class="top" value="til_idx">
                     <div class="avatar"><img src="https://placehold.it/128x128"></div>
                     <div class="address">
-                        <p id="idx">{{til.til_idx}}</p>
+                        <p id="idx">{{til.til_idx}}<span class="two-button"><button type="button" onclick='update_til({{ til.til_idx }})' class="btn btn-primary">수정</button><button type="button" onclick='delete_til({{ til.til_idx }})' class="btn btn-primary">삭제</button></span></p>
                         <div class="name">{{til.til_title}}</div>
                         <div class="writer">{{user_info.user_nickname}}</div>
+
                     </div>
                     <hr>
                     <div class="content">
                         <p>{{til.til_content}}</p>
                         <p>{{til.til_day}}</p>
+
                     </div>
                     <div>
                         <table id="til-table" class="table">

@@ -9,12 +9,13 @@ app = Flask(__name__)
 client = MongoClient('localhost', 27017)
 db = client.tdp
 
-
 SECRET_KEY = 'CodingDeserterPursuit'
 
 import jwt
 import datetime
 import hashlib
+
+
 # 위아래 두칸씩 벌려야함
 
 
@@ -66,6 +67,18 @@ def read_detail():
     return render_template('detail.html', user_info=user_info, til=til, comment=comment)
 
 
+@app.route('/detail')
+def delete_detail():
+    # token_receive = request.cookies.get('mytoken')
+
+    til_idx = request.args.get("til_idx")
+    til_idx = int(til_idx)
+    til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
+    comment = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
+    print(comment)
+    user_info = db.user.find_one({"username": '이진권'})
+    return render_template('detail.html', user_info=user_info, til=til, comment=comment)
+
     # try:
     #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
     #     user_info = db.user.find_one({"username": payload["id"]})
@@ -78,7 +91,6 @@ def read_detail():
 
 @app.route('/til/comment', methods=['POST'])
 def create_comment():
-
     comment_receive = request.form['comment_give']
     date_receive = request.form['date_give']
     til_idx_receive = request.form['til_idx_give']
@@ -156,12 +168,12 @@ def search_detail_page():
 
 @app.route('/til_board_listing', methods=['GET'])
 def all_til():
-    temp = list(db.til.find({}, {'_id': False}))
+    temp = list(db.til.find({}, {'_id': False}).sort("til_day", -1))
     return jsonify({'result': "success", 'all_til': temp})
 
 
 @app.route('/api/list_myTIL', methods=['POST'])
-def read_mytil(): # pep8에러 함수이름
+def read_mytil():  # pep8에러 함수이름
     til_user_receive = request.form['til_user_give']
     my_til = list(db.til.find({'til_user': til_user_receive}).sort('_id', -1))
     for doc in my_til:
@@ -202,27 +214,31 @@ def create_til():
     else:
         max_value = db.til.find_one(sort=[("til_idx", -1)])['til_idx'] + 1
     db.til.count()
-    doc = {'til_idx': max_value, 'til_title': til_title_receive, 'til_user': til_user_receive, 'til_content': til_content_receive,
+    doc = {'til_idx': max_value, 'til_title': til_title_receive, 'til_user': til_user_receive,
+           'til_content': til_content_receive,
            'til_day': datetime.datetime.now(), 'til_view': True}
     db.til.insert_one(doc)
     return jsonify({'msg': 'til 작성 완료!'})
 
+
 @app.route('/api/delete', methods=['POST'])
 def api_delete():
-    til_id_receive = request.form['til_id_give']
-    db.til.delete_one({'_id': ObjectId(til_id_receive)})
+    til_idx_receive = request.form['til_idx_give']
+    til_idx_receive = int(til_idx_receive)
+    db.til.delete_one({'til_idx': til_idx_receive})
     return jsonify({'msg': 'til 삭제 완료!'})
 
 
 @app.route('/api/update', methods=['POST'])
 def api_update():
-    til_id_receive = request.form['til_id_give']
+    til_idx_receive = request.form['til_idx_give']
+    til_idx_receive = int(til_idx_receive)
     til_title_receive = request.form['til_title_give']
     til_content_receive = request.form['til_content_give']
     current_time = datetime.now()
 
     doc = {"$set": {'til_title': til_title_receive, 'til_content': til_content_receive, 'til_update_day': current_time}}
-    db.til.update_one({'_id': ObjectId(til_id_receive)}, doc)
+    db.til.update_one({'til_idx': til_idx_receive}, doc)
     return jsonify({'msg': '수정 완료!'})
 
 
@@ -243,7 +259,7 @@ def api_update_view():
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    user_id= request.form['user_id_give']
+    user_id = request.form['user_id_give']
     user_password = request.form['user_pw_give']
     user_nickname = request.form['user_nickname_give']
 
@@ -278,7 +294,6 @@ def login():
 def api_valid():
     token_receive = request.cookies.get('mytoken')
 
-
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         print(payload)
@@ -300,7 +315,3 @@ def check_dup():
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
-
-
-
-
