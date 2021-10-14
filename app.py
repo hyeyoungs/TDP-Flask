@@ -1,7 +1,5 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
-from datetime import datetime
 from pymongo import MongoClient
-from bson import ObjectId
 
 app = Flask(__name__)
 
@@ -9,14 +7,12 @@ app = Flask(__name__)
 client = MongoClient('localhost', 27017)
 db = client.tdp
 
+
 SECRET_KEY = 'CodingDeserterPursuit'
 
 import jwt
 import datetime
 import hashlib
-
-
-# 위아래 두칸씩 벌려야함
 
 
 @app.route('/')
@@ -50,145 +46,33 @@ def home():
 
 
 @app.route('/til_board')
-def listing_page():
+def list_page():
     return render_template('til_board.html')
 
 
 @app.route('/detail')
-def read_detail():
-    # token_receive = request.cookies.get('mytoken')
-
-    til_idx = request.args.get("til_idx")
-    til_idx = int(til_idx)
-    til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
-    comment = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
-    print(comment)
-    user_info = db.user.find_one({"username": '이진권'})
-    return render_template('detail.html', user_info=user_info, til=til, comment=comment)
+def detail_page():
+    title = request.args.get("title")
+    content = db.til.find_one({'til_title': title}, {'_id': False})
+    return render_template('detail.html', content=content)
 
 
-@app.route('/detail')
-def delete_detail():
-    # token_receive = request.cookies.get('mytoken')
-
-    til_idx = request.args.get("til_idx")
-    til_idx = int(til_idx)
-    til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
-    comment = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
-    print(comment)
-    user_info = db.user.find_one({"username": '이진권'})
-    return render_template('detail.html', user_info=user_info, til=til, comment=comment)
-
-    # try:
-    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #     user_info = db.user.find_one({"username": payload["id"]})
-    #     return render_template('detail.html', user_info=user_info, content=content)
-    # except jwt.ExpiredSignatureError:
-    #     return redirect(url_for("login", msg="로그인 시간이 만료되었습니다."))
-    # except jwt.exceptions.DecodeError:
-    #     return redirect(url_for("login", msg="로그인 정보가 존재하지 않습니다."))
+@app.route('/til/board', methods=['GET'])
+def read_all_til():
+    temp = list(db.til.find({}, {'_id': False}))
+    til_count = db.til.count()
+    return jsonify({'result': "success", 'all_til': temp, "til_count": til_count})
 
 
-@app.route('/til/comment', methods=['POST'])
-def create_comment():
-    comment_receive = request.form['comment_give']
-    date_receive = request.form['date_give']
-    til_idx_receive = request.form['til_idx_give']
-    til_idx_receive = int(til_idx_receive)
-    # writer_receive = request.form['writer_give']
-    comment_count = db.comment.count()
-    if comment_count == 0:
-        max_value = 1
-    else:
-        max_value = db.comment.find_one(sort=[("comment_idx", -1)])['comment_idx'] + 1
-    doc = {
-        # 'comment_writer': writer_receive,
-        'comment_idx': max_value,
-        'til_idx': til_idx_receive,
-        'til_comment': comment_receive,
-        'til_comment_day': date_receive
-    }
-    db.comment.insert_one(doc)
-    msg = "댓글작성 완료"
-    return jsonify({'msg': msg})
-
-
-# @app.route('/detail/comment', methods=['GET'])
-# def read_comment():
-#     til_idx = request.args.get("til_idx")
-#     print(til_idx)
-#     temp = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
-#     print(temp)
-#     return jsonify({'result': "success", 'comment': temp})
-
-
-@app.route('/til/comment', methods=['DELETE'])
-def delete_comment():
-    comment_idx_receive = request.form['comment_idx_give']
-    comment_idx_receive = int(comment_idx_receive)
-    db.comment.delete_one({'comment_idx': comment_idx_receive})
-    return jsonify({'result': "success", 'msg': '삭제 완료'})
-
-
-@app.route('/til_board_detail')
-def search_detail_page():
-    keyword = request.args.get("keyword")
-    setting = request.args.get("setting")
-    if setting == '제목':
-        setting = 'til_title'
-    elif setting == '작성자':
-        setting = 'til_user'
-    else:
-        setting = 'til_content'
-    temp = list(db.til.find({setting: keyword}, {'_id': False}))
-    return render_template("til_board_detail.html", til=temp)
-
-
-# @app.route('/til_board', methods=['POST'])
-# def delete_til():
-#     til_id_receive = request.form['til_id_give']
-#     db.til.delete_one({'_id': til_id_receive})
-#     return jsonify({'msg': '삭제 완료!'})
-
-
-# @app.route('/til_board', methods=['POST'])
-# def search_til():
-#     keyword = request.form['keyword_give']
-#     setting = request.form['setting_give']
-#     if setting == '제목':
-#         setting = 'til_title'
-#     elif setting == '작성자':
-#         setting = 'til_user'
-#     else:
-#         setting = 'til_content'
-#
-#     temp = list(db.til.find({setting: keyword}, {'_id': False}))
-#     return jsonify({'til': temp})
-
-
-@app.route('/til_board_listing', methods=['GET'])
-def all_til():
-    temp = list(db.til.find({}, {'_id': False}).sort("til_day", -1))
-    return jsonify({'result': "success", 'all_til': temp})
-
-
-@app.route('/api/list_myTIL', methods=['POST'])
-def read_mytil():  # pep8에러 함수이름
+@app.route('/user/til', methods=['POST'])
+def read_my_til():
     til_user_receive = request.form['til_user_give']
-    my_til = list(db.til.find({'til_user': til_user_receive}).sort('_id', -1))
-    for doc in my_til:
-        doc["_id"] = str(doc["_id"])
+    my_til = list(db.til.find({'til_user': til_user_receive}, {'_id': False}).sort('_id', -1))
     return jsonify({'result': 'success', 'my_til': my_til})
 
 
-@app.route('/home_listing', methods=['GET'])
-def home_til():
-    temp = list(db.til.find({}, {'_id': False}).sort("_id", -1))
-    return jsonify({'result': "success", 'home_til': temp})
-
-
-@app.route('/home_ranking', methods=['GET'])
-def home_ranking():
+@app.route('/til/rank', methods=['GET'])
+def rank_til():
     agg_result = list(db.til.aggregate([
         {"$group":
             {
@@ -200,7 +84,7 @@ def home_ranking():
              {'til_score': -1}
          }
     ]))
-    return jsonify({'result': "success", 'home_til': agg_result})
+    return jsonify({'result': "success", 'til_rank': agg_result})
 
 
 @app.route('/til', methods=['POST'])
@@ -214,44 +98,46 @@ def create_til():
     else:
         max_value = db.til.find_one(sort=[("til_idx", -1)])['til_idx'] + 1
     db.til.count()
-    doc = {'til_idx': max_value, 'til_title': til_title_receive, 'til_user': til_user_receive,
-           'til_content': til_content_receive,
+    doc = {'til_idx': max_value, 'til_title': til_title_receive, 'til_user': til_user_receive, 'til_content': til_content_receive,
            'til_day': datetime.datetime.now(), 'til_view': True}
     db.til.insert_one(doc)
     return jsonify({'msg': 'til 작성 완료!'})
 
 
-@app.route('/api/delete', methods=['POST'])
-def api_delete():
-    til_idx_receive = request.form['til_idx_give']
-    til_idx_receive = int(til_idx_receive)
-    db.til.delete_one({'til_idx': til_idx_receive})
+@app.route('/til', methods=['GET'])
+def get_til():
+    idx = request.args['idx']
+    doc = db.til.find_one({'til_idx': int(idx)}, {'_id': False})
+    return jsonify({"til": doc})
+
+
+@app.route('/til/<idx>', methods=['DELETE'])
+def delete_til(idx):
+    db.til.delete_one({'til_idx': int(idx)})
     return jsonify({'msg': 'til 삭제 완료!'})
 
 
-@app.route('/api/update', methods=['POST'])
-def api_update():
-    til_idx_receive = request.form['til_idx_give']
-    til_idx_receive = int(til_idx_receive)
+@app.route('/til/<idx>', methods=['PUT'])
+def update_til(idx):
     til_title_receive = request.form['til_title_give']
     til_content_receive = request.form['til_content_give']
-    current_time = datetime.now()
-
+    current_time = datetime.datetime.now()
     doc = {"$set": {'til_title': til_title_receive, 'til_content': til_content_receive, 'til_update_day': current_time}}
-    db.til.update_one({'til_idx': til_idx_receive}, doc)
+    db.til.update_one({'til_idx': int(idx)}, doc)
     return jsonify({'msg': '수정 완료!'})
 
 
-@app.route('/api/update/view', methods=['POST'])
-def api_update_view():
-    til_id_receive = request.form['til_id_give']
-    til_view = db.til.find_one({'_id': ObjectId(til_id_receive)}, {"_id": 0, "til_view": 1})
-    view_value = til_view["til_view"]
+@app.route('/til/view/<idx>', methods=['PUT'])
+def update_view(idx):
+    doc = db.til.find_one({'til_idx': int(idx)})
+    view_value = doc["til_view"]
+
     if not isinstance(view_value, bool):
         msg = '공개 여부의 값이 정확하지 않습니다.'
     else:
         doc = {"$set": {'til_view': not (view_value)}}
-        db.til.update_one({'_id': ObjectId(til_id_receive)}, doc)
+        print(idx, doc)
+        db.til.update_one({'til_idx': int(idx)}, doc)
 
     msg = '변경 완료!'
     return jsonify({'msg': msg})
@@ -259,7 +145,7 @@ def api_update_view():
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    user_id = request.form['user_id_give']
+    user_id= request.form['user_id_give']
     user_password = request.form['user_pw_give']
     user_nickname = request.form['user_nickname_give']
 
@@ -294,6 +180,7 @@ def login():
 def api_valid():
     token_receive = request.cookies.get('mytoken')
 
+
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         print(payload)
@@ -315,3 +202,6 @@ def check_dup():
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
+
+
+
