@@ -65,7 +65,7 @@ def read_all_til():
 
 
 @app.route('/api/list_myTIL', methods=['POST'])
-def read_mytil():  # pep8에러 함수이름
+def read_my_til():  # pep8에러 함수이름
     til_user_receive = request.form['til_user_give']
     my_til = list(db.til.find({'til_user': til_user_receive}, {'_id': False}).sort('_id', -1))
     return jsonify({'result': 'success', 'my_til': my_til})
@@ -167,7 +167,7 @@ def login():
     if result is not None:
         payload = {
             'id': user_id_receive,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60 * 60 * 24)
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60 * 60 * 1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         # header /payload/ signature(이부분)을 발급 -> header로 전달
