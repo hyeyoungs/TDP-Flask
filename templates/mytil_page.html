@@ -9,26 +9,48 @@
 
     <!-- Bootstrap tags -->
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
-                  integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
-                  crossorigin="anonymous">
+          integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+          crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
             integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
             crossorigin="anonymous"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet"
+          id="bootstrap-css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <script>
+
         $(document).ready(function () {
-            show_my_til("Hyeyoung");
+            board_user_find();
         });
 
-        function show_my_til(til_user) {
+
+        function board_user_find() {
+            $.ajax({
+                type: "GET",
+                url: "/nick",
+                data: {user_id_give: $('#user_id').val()},
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        alert('토큰인식완료!')
+                            listMyTIL("Hyeyoung");
+                    } else {
+                        alert('허용되지 않은 접근입니다.')
+                        location.href = "http://localhost:5000/"
+                    }
+                }
+            })
+        }
+
+
+        function listMyTIL(til_user) {
             $.ajax({
                 type: "POST",
                 url: "/user/til",
@@ -154,9 +176,13 @@
                 }
             });
         }
-        function goback(){
-                     window.history.back();
+
+
+        function goback() {
+            window.history.back();
         }
+
+
     </script>
     <style>
         body {
@@ -181,14 +207,16 @@
                 margin-bottom: 2.77rem;
             }
         }
-    .navbar-brand {
-        margin-left: 50px;
-    }
 
-    .nav-link {
+        .navbar-brand {
+            margin-left: 50px;
+        }
 
-        margin-left: 100px;
-    }
+        .nav-link {
+
+            margin-left: 100px;
+        }
+
         /* Reset Bootstrap */
         .dropdown-toggle::after {
             content: none;
@@ -198,8 +226,8 @@
 </head>
 <body>
 
-    <!-- navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+<!-- navigation -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="/">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
@@ -216,46 +244,44 @@
             </div>
         </div>
     </div>
-        <form class="form-inline">
-            <div class="input-group">
-                <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="button-addon2">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-primary" type="button" id="button-addon2">
-                        <i class="fa fa-search"></i>
-                    </button>
-                </div>
+    <form class="form-inline">
+        <div class="input-group">
+            <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="button-addon2">
+            <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="button" id="button-addon2">
+                    <i class="fa fa-search"></i>
+                </button>
             </div>
         </form>
     </nav>
 
 
-
-    <div class="container-fluid gedf-wrapper">
-        <!-- container -->
-        <div class="row">
-            <!-- User Profile -->
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="h5">@Hyeyoung</div>
-                        <div class="h7 text-muted">Fullname : Hyeyoung Kim</div>
-                        <div class="h7">Developer of web applications, JavaScript, PHP, Java, Python, Ruby, Java, Node.js,
-                            etc.
-                        </div>
+<div class="container-fluid gedf-wrapper">
+    <!-- container -->
+    <div class="row">
+        <!-- User Profile -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="h5">@Hyeyoung</div>
+                    <div class="h7 text-muted">Fullname : Hyeyoung Kim</div>
+                    <div class="h7">Developer of web applications, JavaScript, PHP, Java, Python, Ruby, Java, Node.js,
+                        etc.
                     </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <div class="h6 text-muted">Followers</div>
-                            <div class="h5">5.2342</div>
-                        </li>
-                        <li class="list-group-item">
-                            <div class="h6 text-muted">Following</div>
-                            <div class="h5">6758</div>
-                        </li>
-                        <li class="list-group-item">Sparta Coding</li>
-                    </ul>
                 </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <div class="h6 text-muted">Followers</div>
+                        <div class="h5">5.2342</div>
+                    </li>
+                    <li class="list-group-item">
+                        <div class="h6 text-muted">Following</div>
+                        <div class="h5">6758</div>
+                    </li>
+                    <li class="list-group-item">Sparta Coding</li>
+                </ul>
             </div>
+        </div>
 
             <!-- Post List -->
             <div class="col-md-6 gedf-main" id="post-list">
@@ -301,32 +327,32 @@
             </div>
             <!-- Nodal END -->
 
-            <!-- Card List -->
-            <div class="col-md-3">
-                <!-- Card -->
-                <div class="card gedf-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                            card's content.</p>
-                        <a href="#" class="card-link">Card link</a>
-                        <a href="#" class="card-link">Another link</a>
-                    </div>
-                </div>
-                <!-- Card -->
-                <div class="card gedf-card">
-                    <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
-                                card's content.</p>
-                        <a href="#" class="card-link">Card link</a>
-                        <a href="#" class="card-link">Another link</a>
-                    </div>
+        <!-- Card List -->
+        <div class="col-md-3">
+            <!-- Card -->
+            <div class="card gedf-card">
+                <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>
                 </div>
             </div>
-
+            <!-- Card -->
+            <div class="card gedf-card">
+                <div class="card-body">
+                    <h5 class="card-title">Card title</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the
+                        card's content.</p>
+                    <a href="#" class="card-link">Card link</a>
+                    <a href="#" class="card-link">Another link</a>
+                </div>
+            </div>
         </div>
+
     </div>
+</div>
 </body>

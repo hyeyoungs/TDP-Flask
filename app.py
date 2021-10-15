@@ -8,7 +8,6 @@ app = Flask(__name__)
 client = MongoClient('localhost', 27017)
 db = client.tdp
 
-
 SECRET_KEY = 'CodingDeserterPursuit'
 
 import jwt
@@ -21,8 +20,9 @@ def login_page():
     return render_template('login_page.html')
 
 
-@app.route('/main_page')
+@app.route('/main_page', methods=['GET'])
 def main_page():
+    api_valid()
     return render_template('home.html')
 
 
@@ -82,8 +82,8 @@ def read_all_til():
     return jsonify({'result': "success", 'all_til': temp, "til_count": til_count})
 
 
-@app.route('/user/til', methods=['POST'])
-def read_my_til():
+@app.route('/api/list_myTIL', methods=['POST'])
+def read_my_til():  # pep8에러 함수이름
     til_user_receive = request.form['til_user_give']
     my_til = list(db.til.find({'til_user': til_user_receive}, {'_id': False}).sort('_id', -1))
     return jsonify({'result': 'success', 'my_til': my_til})
@@ -163,13 +163,13 @@ def update_view(idx):
 
 @app.route('/users', methods=['POST'])
 def create_user():
-    user_id= request.form['user_id_give']
+    user_id = request.form['user_id_give']
     user_password = request.form['user_pw_give']
     user_nickname = request.form['user_nickname_give']
 
     pw_hash = hashlib.sha256(user_password.encode('utf-8')).hexdigest()
-
     doc = {'user_id': user_id, 'user_password': pw_hash, 'user_nickname': user_nickname, 'github_id': '', 'user_profile_pic': '', 'user_profile_pic_real': 'profile_pics/profile_placeholder.png', 'user_profile_info': ''}
+
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
 
@@ -178,7 +178,6 @@ def create_user():
 def login():
     user_id_receive = request.form['user_id_give']
     user_pw_receive = request.form['user_pw_give']
-
     pw_hash = hashlib.sha256(user_pw_receive.encode('utf-8')).hexdigest()
 
     result = db.user.find_one({'id': user_id_receive, 'password': pw_hash})
@@ -186,9 +185,11 @@ def login():
     if result is not None:
         payload = {
             'id': user_id_receive,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60 * 60 * 24)
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=60 * 60 * 1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+        # header /payload/ signature(이부분)을 발급 -> header로 전달
+        print(token)
         return jsonify({'result': 'success', 'token': token})
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
@@ -198,13 +199,13 @@ def login():
 def api_valid():
     token_receive = request.cookies.get('mytoken')
 
-
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         print(payload)
 
         userinfo = db.user.find_one({'id': payload['id']}, {'_id': 0})
-        return jsonify({'result': 'success', 'nickname': userinfo['nickname']})
+
+        return jsonify({'result': 'success', 'id': userinfo['id']})
     except jwt.ExpiredSignatureError:
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
     except jwt.exceptions.DecodeError:
@@ -266,6 +267,4 @@ def save_img():
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
-
-
 

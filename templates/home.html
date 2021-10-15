@@ -20,10 +20,29 @@
 </head>
 <script>
 
+
     $(document).ready(function () {
-        list_til();
-        rank_til();
+        board_user_find();
     });
+
+
+    function board_user_find() {
+        $.ajax({
+            type: "GET",
+            url: "/nick",
+            data: {user_id_give: $('#user_id').val()},
+            success: function (response) {
+                if (response['result'] === 'success') {
+                    alert('토큰인식완료!')
+                    list_til();
+                    rank_til();
+                } else {
+                    alert('허용되지 않은 접근입니다.')
+                    location.href = "http://localhost:5000/"
+                }
+            }
+        })
+    }
 
     function list_til() {
         $.ajax({
@@ -85,6 +104,7 @@
     }
 
     function sign_out() {
+        {#'mytoken', response['token']#}
         $.removeCookie('mytoken', {path: '/'});
         alert('로그아웃!')
         window.location.href = "/main_page"
@@ -129,7 +149,7 @@
                 <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
                 <a class="nav-link" href="./">myPage</a>
-                <a class="nav-link" href="/">logout</a>
+                <a class="nav-link" onclick="sign_out()" href="/">logout</a>
             </div>
         </div>
     </div>

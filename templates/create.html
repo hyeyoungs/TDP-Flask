@@ -17,28 +17,50 @@
 
     <style>
         body {
-          padding-top: 70px;
-          padding-bottom: 30px;
+            padding-top: 70px;
+            padding-bottom: 30px;
         }
-            .navbar-brand {
-        margin-left: 70px;
-    }
 
-    .nav-link {
-
-        margin-left: 150px;
-    }
         .navbar-brand {
-        margin-left: 50px;
-    }
+            margin-left: 70px;
+        }
 
-    .nav-link {
+        .nav-link {
 
-        margin-left: 100px;
-    }
+            margin-left: 150px;
+        }
+
+        .navbar-brand {
+            margin-left: 50px;
+        }
+
+        .nav-link {
+
+            margin-left: 100px;
+        }
     </style>
     <script>
-        $(document).on('click', '#btnSave', function(e){
+        $(document).ready(function () {
+            board_user_find();
+        });
+
+        function board_user_find() {
+            $.ajax({
+                type: "GET",
+                url: "/nick",
+                data: {user_id_give: $('#user_id').val()},
+                success: function (response) {
+                    if (response['result'] === 'success') {
+                        alert('토큰인식완료!')
+                    } else {
+                        alert('허용되지 않은 접근입니다.')
+                        location.href = "http://localhost:5000/"
+                    }
+                }
+            })
+        }
+
+        $(document).on('click', '#btnSave', function (e) {
             e.preventDefault();
             $("#form").submit();
         });
@@ -52,14 +74,14 @@
                 url: "/til",
                 data: {til_user_give: user, til_title_give: title, til_content_give: content},
                 success: function (response) { // 성공하면
-                    console.log("success");
-                    location.href="/til_board";
+                    location.href = "til_board";
                 }
             })
         }
-        $(document).on('click', '#btnList', function(e){
+
+        $(document).on('click', '#btnList', function (e) {
             e.preventDefault();
-           window.history.back();
+            window.history.back();
         });
     </script>
 </head>
