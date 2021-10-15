@@ -20,10 +20,19 @@
 </head>
 <script>
 
+  
     $(document).ready(function () {
         list_til();
         rank_til();
     });
+  
+  
+    function stop_atuh() {
+        $.ajax({
+            type:"GET",
+            url: "nick"
+        })
+    }
 
     function list_til() {
         $.ajax({
