@@ -82,8 +82,8 @@ def read_all_til():
     return jsonify({'result': "success", 'all_til': temp, "til_count": til_count})
 
 
-@app.route('/api/list_myTIL', methods=['POST'])
-def read_my_til():  # pep8에러 함수이름
+@app.route('/til/user', methods=['POST'])
+def read_user_til():
     til_user_receive = request.form['til_user_give']
     my_til = list(db.til.find({'til_user': til_user_receive}, {'_id': False}).sort('_id', -1))
     return jsonify({'result': 'success', 'my_til': my_til})
@@ -179,9 +179,7 @@ def login():
     user_id_receive = request.form['user_id_give']
     user_pw_receive = request.form['user_pw_give']
     pw_hash = hashlib.sha256(user_pw_receive.encode('utf-8')).hexdigest()
-
-    result = db.user.find_one({'id': user_id_receive, 'password': pw_hash})
-
+    result = db.user.find_one({'user_id': user_id_receive, 'user_password': pw_hash})
     if result is not None:
         payload = {
             'id': user_id_receive,
@@ -203,9 +201,10 @@ def api_valid():
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         print(payload)
 
-        userinfo = db.user.find_one({'id': payload['id']}, {'_id': 0})
+        userinfo = db.user.find_one({'user_id': payload['id']}, {'_id': 0})
+        print(userinfo)
 
-        return jsonify({'result': 'success', 'id': userinfo['id']})
+        return jsonify({'result': 'success', 'id': userinfo['user_id']})
     except jwt.ExpiredSignatureError:
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
     except jwt.exceptions.DecodeError:
