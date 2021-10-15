@@ -22,10 +22,10 @@
             board_user_find();
         });
 
-        function listing() {
+        function list_til_board() {
             $.ajax({
                     type: "GET",
-                    url: "/til_board_listing",
+                    url: "/til/board",
                     data: {},
                     success: function (response) {
                         let all_til = response['all_til'];
@@ -54,7 +54,7 @@
                 success: function (response) {
                     if (response['result'] === 'success') {
                         alert('토큰인식완료!')
-                         listing();
+                         list_til_board();
                     } else {
                         alert('허용되지 않은 접근입니다.')
                          location.href = "http://localhost:5000/"
