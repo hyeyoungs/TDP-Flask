@@ -64,8 +64,8 @@ def read_all_til():
     return jsonify({'result': "success", 'all_til': temp, "til_count": til_count})
 
 
-@app.route('/user/til', methods=['POST'])
-def read_my_til():  # pep8에러 함수이름
+@app.route('/til/user', methods=['POST'])
+def read_user_til():
     til_user_receive = request.form['til_user_give']
     my_til = list(db.til.find({'til_user': til_user_receive}, {'_id': False}).sort('_id', -1))
     return jsonify({'result': 'success', 'my_til': my_til})
