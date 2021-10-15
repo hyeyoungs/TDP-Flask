@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
+from werkzeug.utils import secure_filename
 from pymongo import MongoClient
 
 app = Flask(__name__)
@@ -57,6 +58,23 @@ def detail_page():
     return render_template('detail.html', content=content)
 
 
+@app.route('/my_page')
+def my_page():
+    # token_receive = request.cookies.get('mytoken')
+    # try:
+    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    #     status = (user_id == payload["id"])
+    #
+    #     user_info = db.users.find_one({"user_id": user_id}, {"_id": False})
+    #     return render_template('my_page.html', user_info=user_info, status=status)
+    # except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+    #     return redirect(url_for("home"))
+    # payload["id"]를 sunzero0116으로 가정
+    user_info = db.user.find_one({"user_id": "sunzero0116"}, {"_id": False})
+    print(user_info)
+    return render_template('my_page.html', user_info=user_info)
+
+
 @app.route('/til/board', methods=['GET'])
 def read_all_til():
     temp = list(db.til.find({}, {'_id': False}))
@@ -105,7 +123,7 @@ def create_til():
 
 
 @app.route('/til', methods=['GET'])
-def get_til():
+def read_til():
     idx = request.args['idx']
     doc = db.til.find_one({'til_idx': int(idx)}, {'_id': False})
     return jsonify({"til": doc})
@@ -151,7 +169,7 @@ def create_user():
 
     pw_hash = hashlib.sha256(user_password.encode('utf-8')).hexdigest()
 
-    doc = {'id': user_id, 'password': pw_hash, 'nickname': user_nickname}
+    doc = {'user_id': user_id, 'user_password': pw_hash, 'user_nickname': user_nickname, 'github_id': '', 'user_profile_pic': '', 'user_profile_pic_real': 'profile_pics/profile_placeholder.png', 'user_profile_info': ''}
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
 
@@ -198,6 +216,52 @@ def check_dup():
     user_id_receive = request.form['user_id_give']
     exists = bool(db.user.find_one({"id": user_id_receive}))
     return jsonify({'result': 'success', 'exists': exists})
+
+
+@app.route('/update_profile', methods=['POST'])
+def save_img():
+    # token_receive = request.cookies.get('mytoken')
+    # try:
+    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    #     username = payload["id"]
+    #     name_receive = request.form["name_give"]
+    #     about_receive = request.form["about_give"]
+    #     new_doc = {
+    #         "profile_name": name_receive,
+    #         "profile_info": about_receive
+    #     }
+    #     if 'file_give' in request.files:
+    #         file = request.files["file_give"]
+    #         filename = secure_filename(file.filename)
+    #         extension = filename.split(".")[-1]
+    #         file_path = f"profile_pics/{username}.{extension}"
+    #         file.save("./static/"+file_path)
+    #         new_doc["user_profile_pic"] = filename
+    #         new_doc["user_profile_pic_real"] = file_path
+    #     db.users.update_one({'user_id': payload['id']}, {'$set':new_doc})
+    #     return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
+    # except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+    #     return redirect(url_for("home"))
+    user_id = "sunzero0116"
+    name_receive = request.form["nickname_give"]
+    github_id_receive = request.form["github_id_give"]
+    about_receive = request.form["about_give"]
+    new_doc = {
+        "user_nickname": name_receive,
+        "github_id": github_id_receive,
+        "user_profile_info": about_receive
+    }
+    if 'file_give' in request.files:
+        file = request.files["file_give"]
+        filename = secure_filename(file.filename)
+        extension = filename.split(".")[-1]
+        file_path = f"profile_pics/{user_id}.{extension}"
+        file.save("./static/" + file_path)
+        new_doc["user_profile_pic"] = filename
+        new_doc["user_profile_pic_real"] = file_path
+    print(new_doc)
+    db.user.update_one({'user_id': user_id}, {'$set': new_doc})
+    return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
 
 
 if __name__ == '__main__':
