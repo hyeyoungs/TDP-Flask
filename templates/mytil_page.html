@@ -40,7 +40,7 @@
                 success: function (response) {
                     if (response['result'] === 'success') {
                         alert('토큰인식완료!')
-                            listMyTIL("Hyeyoung");
+                            list_user_til("Hyeyoung");
                     } else {
                         alert('허용되지 않은 접근입니다.')
                         location.href = "http://localhost:5000/"
@@ -50,10 +50,10 @@
         }
 
 
-        function listMyTIL(til_user) {
+        function list_user_til(til_user) {
             $.ajax({
                 type: "POST",
-                url: "/user/til",
+                url: "/til/user",
                 data: {til_user_give: til_user},
                 success: function (response) {
                     let my_til = response['my_til'];
@@ -237,9 +237,9 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div id="navbar-nav" class="navbar-nav">
                 <a class="nav-link " href="./til_board">Write TIL</a>
-                <a class="nav-link" href="#">My TIL</a>
+                <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
-                <a class="nav-link" href="/">logout</a>
+                <a class="nav-link" href="./my_page">myPage</a>
                 <a class="nav-link" onclick="goback()">Back</a>
             </div>
         </div>
@@ -252,8 +252,10 @@
                     <i class="fa fa-search"></i>
                 </button>
             </div>
+        </div>
         </form>
     </nav>
+
 
 
 <div class="container-fluid gedf-wrapper">

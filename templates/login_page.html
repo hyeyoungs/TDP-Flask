@@ -484,7 +484,7 @@
                 success: function (response) {
                     if (response['result'] === 'success') {
                         alert('회원가입이 완료되었습니다.')
-                        window.location.href = '/main_page'
+                        window.location.href = '/'
                     } else {
                         alert(response['msg'])
                     }
@@ -504,7 +504,7 @@
 
         function check_dup() {
             let user_id = $("#sign_id").val()
-            let user_pw = $("#user_pw").val()
+            let user_pw = $("#sign_pw").val()
             let user_nick = $("#sign_nick").val()
             let user_check_pw = $("#sign_confirm_pw").val()
             console.log(user_id)
