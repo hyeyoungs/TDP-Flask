@@ -448,7 +448,7 @@
                 data: {user_id_give: $('#user_id').val(), user_pw_give: $('#user_pw').val()},
                 success: function (response) {
                     if (response['result'] === 'success') {
-                        $.cookie('mytoken', response['token']);
+                        $.cookie('mytoken', response['token'],{path: '/'});
                         alert('로그인 완료!')
                         window.location.href = '/main_page';
                     } else {
@@ -475,7 +475,7 @@
         function sign_up() {
             $.ajax({
                 type: "POST",
-                url: "/users",
+                url: "/user",
                 data: {
                     user_id_give: $('#sign_id').val(),
                     user_pw_give: $('#sign_pw').val(),
