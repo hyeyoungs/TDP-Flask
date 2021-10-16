@@ -60,19 +60,16 @@ def detail_page():
 
 @app.route('/my_page')
 def my_page():
-    # token_receive = request.cookies.get('mytoken')
-    # try:
-    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #     status = (user_id == payload["id"])
-    #
-    #     user_info = db.users.find_one({"user_id": user_id}, {"_id": False})
-    #     return render_template('my_page.html', user_info=user_info, status=status)
-    # except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-    #     return redirect(url_for("home"))
-    # payload["id"]를 sunzero0116으로 가정
-    user_info = db.user.find_one({"user_id": "sunzero0116"}, {"_id": False})
-    print(user_info)
-    return render_template('my_page.html', user_info=user_info)
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        print(payload['id'])
+        print(user_info)
+        return render_template('my_page.html', user_info=user_info)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
 
 
 @app.route('/til/board', methods=['GET'])
@@ -161,7 +158,7 @@ def update_view(idx):
     return jsonify({'msg': msg})
 
 
-@app.route('/users', methods=['POST'])
+@app.route('/user', methods=['POST'])
 def create_user():
     user_id = request.form['user_id_give']
     user_password = request.form['user_pw_give']
@@ -220,48 +217,31 @@ def check_dup():
 
 @app.route('/update_profile', methods=['POST'])
 def save_img():
-    # token_receive = request.cookies.get('mytoken')
-    # try:
-    #     payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-    #     username = payload["id"]
-    #     name_receive = request.form["name_give"]
-    #     about_receive = request.form["about_give"]
-    #     new_doc = {
-    #         "profile_name": name_receive,
-    #         "profile_info": about_receive
-    #     }
-    #     if 'file_give' in request.files:
-    #         file = request.files["file_give"]
-    #         filename = secure_filename(file.filename)
-    #         extension = filename.split(".")[-1]
-    #         file_path = f"profile_pics/{username}.{extension}"
-    #         file.save("./static/"+file_path)
-    #         new_doc["user_profile_pic"] = filename
-    #         new_doc["user_profile_pic_real"] = file_path
-    #     db.users.update_one({'user_id': payload['id']}, {'$set':new_doc})
-    #     return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
-    # except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-    #     return redirect(url_for("home"))
-    user_id = "sunzero0116"
-    name_receive = request.form["nickname_give"]
-    github_id_receive = request.form["github_id_give"]
-    about_receive = request.form["about_give"]
-    new_doc = {
-        "user_nickname": name_receive,
-        "github_id": github_id_receive,
-        "user_profile_info": about_receive
-    }
-    if 'file_give' in request.files:
-        file = request.files["file_give"]
-        filename = secure_filename(file.filename)
-        extension = filename.split(".")[-1]
-        file_path = f"profile_pics/{user_id}.{extension}"
-        file.save("./static/" + file_path)
-        new_doc["user_profile_pic"] = filename
-        new_doc["user_profile_pic_real"] = file_path
-    print(new_doc)
-    db.user.update_one({'user_id': user_id}, {'$set': new_doc})
-    return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload["id"]
+        name_receive = request.form["nickname_give"]
+        github_id_receive = request.form["github_id_give"]
+        about_receive = request.form["about_give"]
+        new_doc = {
+            "user_nickname": name_receive,
+            "github_id": github_id_receive,
+            "user_profile_info": about_receive
+        }
+        if 'file_give' in request.files:
+            file = request.files["file_give"]
+            filename = secure_filename(file.filename)
+            extension = filename.split(".")[-1]
+            file_path = f"profile_pics/{user_id}.{extension}"
+            file.save("./static/" + file_path)
+            new_doc["user_profile_pic"] = filename
+            new_doc["user_profile_pic_real"] = file_path
+        print(new_doc)
+        db.user.update_one({'user_id': user_id}, {'$set': new_doc})
+        return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
 
 
 if __name__ == '__main__':
