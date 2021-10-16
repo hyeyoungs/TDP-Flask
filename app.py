@@ -33,7 +33,14 @@ def signup_page():
 
 @app.route('/mytil_page')
 def mytil_page():
-    return render_template('mytil_page.html')
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        return render_template('mytil_page.html', user_info=user_info)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
 
 
 @app.route('/create_page')
