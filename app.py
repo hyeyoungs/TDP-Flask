@@ -1,3 +1,4 @@
+import boto3
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
@@ -240,10 +241,21 @@ def save_img():
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
-            file_path = f"profile_pics/{user_id}.{extension}"
-            file.save("./static/" + file_path)
+            file_path = f"https://tdpbucket.s3.ap-northeast-2.amazonaws.com/{filename}"
+
             new_doc["user_profile_pic"] = filename
             new_doc["user_profile_pic_real"] = file_path
+
+            s3 = boto3.client('s3',
+                              aws_access_key_id = "AKIATSVR2XDWHJMK2ZHJ",
+                              aws_secret_access_key = "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")
+            s3.put_object(
+                ACL="public-read",
+                Bucket="tdpbucket",
+                Body=file,
+                Key=filename,
+                ContentType=extension)
+
         print(new_doc)
         db.user.update_one({'user_id': user_id}, {'$set': new_doc})
         return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
