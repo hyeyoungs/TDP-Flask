@@ -1,4 +1,4 @@
-import boto3
+import boto3, os, jwt, datetime, hashlib
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
@@ -6,14 +6,10 @@ from pymongo import MongoClient
 app = Flask(__name__)
 
 # pc 용 :
-client = MongoClient('localhost', 27017)
+client = MongoClient(os.environ.get("MONGO_DB_PATH"))
 db = client.tdp
 
 SECRET_KEY = 'CodingDeserterPursuit'
-
-import jwt
-import datetime
-import hashlib
 
 
 @app.route('/')
@@ -241,17 +237,18 @@ def save_img():
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
-            file_path = f"https://tdpbucket.s3.ap-northeast-2.amazonaws.com/{filename}"
+            file_path = os.environ.get("S3_URI")+"/{filename}"
 
             new_doc["user_profile_pic"] = filename
             new_doc["user_profile_pic_real"] = file_path
 
             s3 = boto3.client('s3',
-                              aws_access_key_id = "AKIATSVR2XDWHJMK2ZHJ",
-                              aws_secret_access_key = "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")
+                              aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID"),
+                              aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+                              )
             s3.put_object(
                 ACL="public-read",
-                Bucket="tdpbucket",
+                Bucket=os.environ.get("S3_BUCKET"),
                 Body=file,
                 Key=filename,
                 ContentType=extension)
