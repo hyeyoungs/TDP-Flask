@@ -16,14 +16,37 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
-    <title>Title</title>
+    <!-- cookie -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <title>Title | TIL.D.P</title>
 </head>
 <script>
 
+
     $(document).ready(function () {
-        list_til();
-        rank_til();
+        board_user_find();
     });
+
+
+    function board_user_find() {
+        $.ajax({
+            type: "GET",
+            url: "/nick",
+            data: {user_id_give: $('#user_id').val()},
+            success: function (response) {
+                if (response['result'] === 'success') {
+                    alert('토큰인식완료!')
+                    list_til();
+                    rank_til();
+                } else {
+                    alert('허용되지 않은 접근입니다.')
+                    location.href = "http://localhost:5000/"
+                }
+            }
+        })
+    }
 
     function list_til() {
         $.ajax({
@@ -85,9 +108,10 @@
     }
 
     function sign_out() {
+        {#'mytoken', response['token']#}
         $.removeCookie('mytoken', {path: '/'});
         alert('로그아웃!')
-        window.location.href = "/main_page"
+        window.location.href = "/"
     }
 </script>
 <style>
@@ -118,7 +142,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">TIL.D.P</a>
+        <a class="navbar-brand" href="/home">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -128,8 +152,8 @@
                 <a class="nav-link " href="./til_board">Write TIL</a>
                 <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
-                <a class="nav-link" href="./">myPage</a>
-                <a class="nav-link" href="/">logout</a>
+                <a class="nav-link" href="./my_page">myPage</a>
+                <a class="nav-link" onclick="sign_out()">logout</a>
             </div>
         </div>
     </div>
