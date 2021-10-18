@@ -20,6 +20,11 @@
             crossorigin="anonymous"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet"
           id="bootstrap-css">
+    <!-- Bulma CSS 링크 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="{{ url_for('static', filename='mystyle.css') }}" rel="stylesheet">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
@@ -122,16 +127,16 @@
             $('#new-box').hide();
         }
 
-        function toggle_like(post_id, type) {
-            console.log(post_id, type)
-            let $a_like = $(`#${post_id} a[aria-label='heart']`)
+        function toggle_like(til_idx, type) {
+            console.log(til_idx, type)
+            let $a_like = $(`#${til_idx} a[aria-label='heart']`)
             let $i_like = $a_like.find("i")
             if ($i_like.hasClass("fa-heart")) {
                 $.ajax({
                     type: "POST",
                     url: "/update_like",
                     data: {
-                        post_id_give: post_id,
+                        til_idx_give: til_idx,
                         type_give: type,
                         action_give: "unlike"
                     },
@@ -146,7 +151,7 @@
                     type: "POST",
                     url: "/update_like",
                     data: {
-                        post_id_give: post_id,
+                        til_idx_give: til_idx,
                         type_give: type,
                         action_give: "like"
                     },
@@ -159,6 +164,7 @@
 
             }
         }
+
 
     </script>
 
@@ -212,6 +218,26 @@
         .like {
             float: right;
         }
+
+        .new-content {
+            border-style: solid;
+            border-width: 2px;
+            padding: 12px;
+            word-break: break-all;
+            border-color: LightGray;
+            background-color: rgba(211, 211, 211, 0.2)
+        }
+
+        }
+        .new-box {
+            border-color: DodgerBlue;
+            background-color: rgba(30, 144, 255, 0.2);
+        }
+
+        .center {
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
@@ -255,8 +281,8 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body">
-                    <div class="h5">{{ user_info.user_nickname }}</div>
-                    <div class="h7 text-muted">Fullname : {{ user_info.username }}</div>
+                    <div class="h5">{{ userinfo.user_nickname }}</div>
+                    <div class="h7 text-muted">Fullname : {{ userinfo.username }}</div>
                     <div class="h7">Developer of web applications, JavaScript, PHP, Java, Python, Ruby, Java, Node.js,
                         etc.
                     </div>
@@ -264,11 +290,11 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
                         <div class="h6 text-muted">Followers</div>
-                        <div class="h5">{{ user_info.user_followers }}</div>
+                        <div class="h5">{{ userinfo.user_followers }}</div>
                     </li>
                     <li class="list-group-item">
                         <div class="h6 text-muted">Followings</div>
-                        <div class="h5">{{ user_info.user_followings }}</div>
+                        <div class="h5">{{ userinfo.user_followings }}</div>
                     </li>
                     <li class="list-group-item">Sparta Coding</li>
                 </ul>
@@ -277,36 +303,52 @@
         <div id="message-pane" class="column is-6 message hero is-fullheight">
 
             <div class="box message-preview">
-                <div class="top" value="til_idx">
+                <div class="top" >
                     <div class="avatar"><img src="https://placehold.it/128x128"></div>
                     <div class="address">
-                        <p id="idx">{{ til.til_idx }}<span class="two-button"><button type="button" onclick='new_box()'
-                                                                                      class="btn btn-primary">수정</button><button
-                                type="button" onclick='delete_til({{ til.til_idx }})'
-                                class="btn btn-primary">삭제</button></span></p>
-                        <div class="name">{{ til.til_title }}</div>
-                        <div class="writer">{{ user_info.user_nickname }}</div>
+                        <p id="idx">{{ til.til_idx }}</p>
+                        <button type="button" onclick='new_box()' class="btn btn-primary two-button">수정</button>&nbsp;
+                        <button type="button" onclick='delete_til({{ til.til_idx }})'
+                                class="btn btn-primary two-button">삭제
+                        </button>
+
+                        <div class="til" id="{{ til.til_idx }}">{{ til.til_title }}&nbsp;
+                            <nav class="level is-mobile">
+                                <div class="level-left">
+                                    <a class="level-item is-sparta" aria-label="heart"
+                                       onclick="toggle_like({{ til.til_idx }}, 'heart')">
+                                        <span class="icon is-small"><i class="fa fa-heart"
+                                                                       aria-hidden="true"></i></span>&nbsp;<span
+                                            class="like-num">2.7k</span>
+                                    </a>
+                                </div>
+                            </nav>
+                        </div>
+                        <div class="writer">{{ userinfo.user_nickname }}</div>
 
                     </div>
-                    <hr>
-                    <div class="content">
-                        <p id="til_content">{{ til.til_content }}</p>
-                        <div id="new-box" class="form-group">
 
-                            <label for="exampleFormControlInput1">제목</label>
+
+                    <div id="new-box" class="new-content">
+                        <div class="new-box">
+                            <label for="exampleFormControlInput1" class="center">제목</label>
                             <p><textarea class="form-control" id="new-til-title" rows="1">{{ til.til_title }}</textarea>
                             </p>
+                            <label for="exampleFormControlInput1" class="center">content</label>
                             <textarea class="form-control" id="new-til-content"
-                                      rows="8">{{ til.til_content }}</textarea>
-                            <p id="new-content-button"><span class="two-button"><button type="button"
-                                                                                        onclick='update_til({{ til.til_idx }})'
-                                                                                        class="btn btn-primary">변경</button><button
-                                    type="button" onclick='cancle()' class="btn btn-primary">취소</button></span></p>
+                                      rows="8">{{ til.til_content }}</textarea><br>
+                            <p id="new-content-button"><span class="two-button">
+                                <button type="button" onclick='update_til({{ til.til_idx }})'
+                                        class="btn btn-primary">변경</button>
+                                <button type="button" onclick='cancle()' class="btn btn-primary">취소</button>
+                            </span></p>
+                            <br>
+                            <p>{{ til.til_day }}</p>
 
                         </div>
-                        <p>{{ til.til_day }}</p>
-                        <button type="button" onclick='til_like()' class="btn btn-primary like">좋아요</button>
+
                     </div>
+
                     <div>
                         <table id="til-table" class="table">
                             <thead>
