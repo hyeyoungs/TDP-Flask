@@ -53,7 +53,6 @@ def create_page():
 
 @app.route('/main_page')
 def home():
-    global flag
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
