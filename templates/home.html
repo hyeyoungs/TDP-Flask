@@ -26,9 +26,18 @@
 
 
     $(document).ready(function () {
-        board_user_find();
+        board_user_find()
+        state_home_switch({{ flag }})
     });
 
+    function state_home_switch(flag) {
+        if (flag === 0) {
+            $(".test").css("background-color",'red');
+        }
+        else if (flag === 1) {
+            $(".test").css("background-color",'blue');// display 속성을 block 으로 바꾼다.
+        }
+    }
 
     function board_user_find() {
         $.ajax({
@@ -93,7 +102,7 @@
                         let user = til_rank[i]['_id'];
                         let score = til_rank[i]['til_score'];
                         let temp_html = `<tr>
-                                                <th>${i+1}</th>
+                                                <th>${i + 1}</th>
                                                 <th scope="row">${user}</th>
                                                 <td>${score}</td>
                                             </tr>
@@ -138,11 +147,19 @@
         margin-left: 20px;
     }
 
+    .test {
+        float: left;
+        width: 200px;
+        height: 200px;
+        background-color: yellow;
+        display: block;
+    }
+
 </style>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/home">TIL.D.P</a>
+        <a class="navbar-brand" href="/main_page">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -177,16 +194,15 @@
 </div>
 <div class="left_write">
     <br><br>
+    <div class="test rounded-circle"></div><br>
     <h1>당신의 TIL 작성을</h1><br>
+    </div>
     <h1>관리해주는</h1><br>
 
     <h1>TIL 관리 서비스</h1>
-</div>
 <br>
 <br><br><br>
 <div class="row row-cols-3 row-cols-md-5 g-3 board-main" id="board-main">
-
-</div>
 </div>
 </body>
 </html>

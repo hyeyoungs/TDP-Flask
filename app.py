@@ -20,12 +20,6 @@ def login_page():
     return render_template('login_page.html')
 
 
-@app.route('/main_page', methods=['GET'])
-def main_page():
-    api_valid()
-    return render_template('home.html')
-
-
 @app.route('/signup_page')
 def signup_page():
     return render_template('signup_page.html')
@@ -48,9 +42,32 @@ def create_page():
     return render_template('create.html')
 
 
-@app.route('/home')
+@app.route('/main_page')
 def home():
-    return render_template('home.html')
+    global flag
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        print(payload['id'])
+        print(user_info)
+        print("여기")
+        til_state = list(db.til.find({"til_user": payload["id"]}, {"til_day": 1, "_id": False}))
+        print(til_state)
+        today = datetime.datetime.now().strftime('%Y-%m-%d')
+        for doc in til_state:
+            old_day = doc['til_day'].strftime('%Y-%m-%d')
+            print(old_day)
+            if today == old_day:
+                flag = 1
+                break
+            else:
+                flag = 0
+        print(flag)
+        return render_template('home.html', user_info=user_info, flag=flag)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
 
 
 @app.route('/til_board')
@@ -203,7 +220,7 @@ def api_valid():
 
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        print(payload)
+        print(payload['id'])
 
         userinfo = db.user.find_one({'user_id': payload['id']}, {'_id': 0})
         print(userinfo)
