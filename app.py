@@ -59,10 +59,87 @@ def list_page():
 
 
 @app.route('/detail')
-def detail_page():
-    title = request.args.get("title")
-    content = db.til.find_one({'til_title': title}, {'_id': False})
-    return render_template('detail.html', content=content)
+def detail():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        til_idx = request.args.get("til_idx")
+        til_idx = int(til_idx)
+        print(til_idx)
+        til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
+        comment = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        like = list(db.like.find({"til_idx": til_idx}, {"_id": False}))
+        print(like)
+        count = db.like.count_documents({"til_idx": til_idx, "type": 'heart'})
+        print(count)
+        action = bool(db.like.find_one({"user_id": user_info['user_id'], "til_idx": til_idx}))
+
+        return render_template('detail.html', user_info=user_info, til=til, comment=comment, like=like, count=count,
+                               action=action)
+
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+
+@app.route('/til/comment', methods=['POST'])
+def create_comment():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        comment_receive = request.form['comment_give']
+        date_receive = request.form['date_give']
+        til_idx_receive = request.form['til_idx_give']
+        til_idx_receive = int(til_idx_receive)
+        comment_count = db.comment.count()
+        if comment_count == 0:
+            max_value = 1
+        else:
+            max_value = db.comment.find_one(sort=[("comment_idx", -1)])['comment_idx'] + 1
+        doc = {
+            'user_id': user_info["user_id"],
+            'comment_idx': max_value,
+            'til_idx': til_idx_receive,
+            'til_comment': comment_receive,
+            'til_comment_day': date_receive
+        }
+        db.comment.insert_one(doc)
+        msg = "댓글작성 완료"
+        return jsonify({'msg': msg})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+
+@app.route('/til/comment', methods=['DELETE'])
+def delete_comment():
+    comment_idx_receive = request.form['comment_idx_give']
+    comment_idx_receive = int(comment_idx_receive)
+    db.comment.delete_one({'comment_idx': comment_idx_receive})
+    return jsonify({'result': "success", 'msg': '삭제 완료'})
+
+
+@app.route('/til_board_detail')
+def search_detail_page():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        print(payload)
+        keyword = request.args.get("keyword")
+        setting = request.args.get("setting")
+        if setting == '제목':
+            setting = 'til_title'
+        elif setting == '작성자':
+            setting = 'til_user'
+        else:
+            setting = 'til_content'
+        userinfo = db.user.find_one({'id': payload['id']}, {'_id': 0})
+        temp = list(db.til.find({setting: keyword}, {'_id': False}))
+        return render_template("til_board_detail.html", til=temp, userinfo=userinfo)
+    except jwt.ExpiredSignatureError:
+        return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
+    except jwt.exceptions.DecodeError:
+        return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
 
 
 @app.route('/my_page')
@@ -163,6 +240,36 @@ def update_view(idx):
 
     msg = '변경 완료!'
     return jsonify({'msg': msg})
+
+
+@app.route('/update_like', methods=['POST'])
+def update_like():
+    token_receive = request.cookies.get('mytoken')
+    til_idx_receive = request.form["til_idx_give"]
+    type_receive = request.form["type_give"]
+    action_receive = request.form["action_give"]
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        print(payload)
+        user_info = db.user.find_one({'user_id': payload['id']}, {'_id': 0})
+        print(user_info)
+        til_idx_receive = int(til_idx_receive)
+        doc = {
+            "til_idx": til_idx_receive,
+            "type": type_receive,
+            "user_id": user_info['user_id']
+        }
+        if action_receive == "like":
+            db.like.insert_one(doc)
+        else:
+            db.like.delete_one(doc)
+        count = db.like.count_documents({"til_idx": til_idx_receive, "type": type_receive})
+        print(count)
+        return jsonify({"result": "success", 'msg': 'updated', "count": count})
+    except jwt.ExpiredSignatureError:
+        return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
+    except jwt.exceptions.DecodeError:
+        return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
 
 
 @app.route('/user', methods=['POST'])
