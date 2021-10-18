@@ -19,7 +19,7 @@
 
     <script>
         $(document).ready(function () {
-            board_user_find();
+             list_til_board();
         });
 
         function list_til_board() {
@@ -44,25 +44,6 @@
                 }
             )
         }
-
-
-        function board_user_find(){
-              $.ajax({
-                type: "GET",
-                url: "/nick",
-                data: {user_id_give: $('#user_id').val()},
-                success: function (response) {
-                    if (response['result'] === 'success') {
-                        alert('토큰인식완료!')
-                         list_til_board();
-                    } else {
-                        alert('허용되지 않은 접근입니다.')
-                         location.href = "http://localhost:5000/"
-                    }
-                }
-            })
-        }
-
 
         function search(title) {
             location.href = "http://localhost:5000/detail" + "?title=" + title;

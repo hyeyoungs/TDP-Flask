@@ -16,6 +16,7 @@ import hashlib
 
 
 @app.route('/')
+@app.route('/login')
 def login_page():
     return render_template('login_page.html')
 
@@ -34,12 +35,19 @@ def mytil_page():
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
         return render_template('mytil_page.html', user_info=user_info)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-        return redirect(url_for("home"))
+        return redirect(url_for("login"))
 
 
 @app.route('/create_page')
 def create_page():
-    return render_template('create.html')
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        return render_template('create.html', user_info=user_info)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
 
 
 @app.route('/main_page')
@@ -50,36 +58,43 @@ def home():
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
 
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
-        print(payload['id'])
-        print(user_info)
-        print("여기")
         til_state = list(db.til.find({"til_user": payload["id"]}, {"til_day": 1, "_id": False}))
-        print(til_state)
         today = datetime.datetime.now().strftime('%Y-%m-%d')
         for doc in til_state:
             old_day = doc['til_day'].strftime('%Y-%m-%d')
-            print(old_day)
             if today == old_day:
                 flag = 1
                 break
             else:
                 flag = 0
-        print(flag)
         return render_template('home.html', user_info=user_info, flag=flag)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-        return redirect(url_for("home"))
+        return redirect(url_for("login"))
 
 
 @app.route('/til_board')
 def list_page():
-    return render_template('til_board.html')
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        return render_template('til_board.html', user_info=user_info)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
 
 
 @app.route('/detail')
 def detail_page():
+    token_receive = request.cookies.get('mytoken')
     title = request.args.get("title")
     content = db.til.find_one({'til_title': title}, {'_id': False})
-    return render_template('detail.html', content=content)
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        return render_template('detail.html', content=content, user_info=user_info)
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
 
 
 @app.route('/my_page')
@@ -87,13 +102,10 @@ def my_page():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
-        print(payload['id'])
-        print(user_info)
         return render_template('my_page.html', user_info=user_info)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-        return redirect(url_for("home"))
+        return redirect(url_for("login"))
 
 
 @app.route('/til/board', methods=['GET'])
@@ -117,10 +129,10 @@ def rank_til():
             {
                 "_id": "$til_user",
                 "til_score": {"$sum": 1}
-            }
-        },
+            }},
         {"$sort":
-             {'til_score': -1}
+            {
+                 'til_score': -1}
          }
     ]))
     return jsonify({'result': "success", 'til_rank': agg_result})
@@ -137,7 +149,8 @@ def create_til():
     else:
         max_value = db.til.find_one(sort=[("til_idx", -1)])['til_idx'] + 1
     db.til.count()
-    doc = {'til_idx': max_value, 'til_title': til_title_receive, 'til_user': til_user_receive, 'til_content': til_content_receive,
+    doc = {'til_idx': max_value, 'til_title': til_title_receive, 'til_user': til_user_receive,
+           'til_content': til_content_receive,
            'til_day': datetime.datetime.now(), 'til_view': True}
     db.til.insert_one(doc)
     return jsonify({'msg': 'til 작성 완료!'})
@@ -175,7 +188,6 @@ def update_view(idx):
         msg = '공개 여부의 값이 정확하지 않습니다.'
     else:
         doc = {"$set": {'til_view': not (view_value)}}
-        print(idx, doc)
         db.til.update_one({'til_idx': int(idx)}, doc)
 
     msg = '변경 완료!'
@@ -189,7 +201,9 @@ def create_user():
     user_nickname = request.form['user_nickname_give']
 
     pw_hash = hashlib.sha256(user_password.encode('utf-8')).hexdigest()
-    doc = {'user_id': user_id, 'user_password': pw_hash, 'user_nickname': user_nickname, 'github_id': '', 'user_profile_pic': '', 'user_profile_pic_real': 'profile_pics/profile_placeholder.png', 'user_profile_info': ''}
+    doc = {'user_id': user_id, 'user_password': pw_hash, 'user_nickname': user_nickname, 'github_id': '',
+           'user_profile_pic': '', 'user_profile_pic_real': 'profile_pics/profile_placeholder.png',
+           'user_profile_info': ''}
 
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
@@ -208,28 +222,9 @@ def login():
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
         # header /payload/ signature(이부분)을 발급 -> header로 전달
-        print(token)
         return jsonify({'result': 'success', 'token': token})
     else:
         return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
-
-
-@app.route('/nick', methods=['GET'])
-def api_valid():
-    token_receive = request.cookies.get('mytoken')
-
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        print(payload['id'])
-
-        userinfo = db.user.find_one({'user_id': payload['id']}, {'_id': 0})
-        print(userinfo)
-
-        return jsonify({'result': 'success', 'id': userinfo['user_id']})
-    except jwt.ExpiredSignatureError:
-        return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
-    except jwt.exceptions.DecodeError:
-        return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
 
 
 @app.route('/check_dup', methods=['POST'])
@@ -261,13 +256,11 @@ def save_img():
             file.save("./static/" + file_path)
             new_doc["user_profile_pic"] = filename
             new_doc["user_profile_pic_real"] = file_path
-        print(new_doc)
         db.user.update_one({'user_id': user_id}, {'$set': new_doc})
         return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-        return redirect(url_for("home"))
+        return redirect(url_for("login"))
 
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
-
