@@ -1,3 +1,4 @@
+import boto3, os, jwt, datetime, hashlib
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
@@ -5,14 +6,10 @@ from pymongo import MongoClient
 app = Flask(__name__)
 
 # pc 용 :
-client = MongoClient('localhost', 27017)
+client = MongoClient(os.environ.get("MONGO_DB_PATH"))
 db = client.tdp
 
 SECRET_KEY = 'CodingDeserterPursuit'
-
-import jwt
-import datetime
-import hashlib
 
 
 @app.route('/')
@@ -172,7 +169,7 @@ def create_user():
     user_nickname = request.form['user_nickname_give']
 
     pw_hash = hashlib.sha256(user_password.encode('utf-8')).hexdigest()
-    doc = {'user_id': user_id, 'user_password': pw_hash, 'user_nickname': user_nickname, 'github_id': '', 'user_profile_pic': '', 'user_profile_pic_real': 'profile_pics/profile_placeholder.png', 'user_profile_info': ''}
+    doc = {'user_id': user_id, 'user_password': pw_hash, 'user_nickname': user_nickname, 'github_id': '', 'user_profile_pic': '', 'user_profile_pic_real': 'static/profile_pics/profile_placeholder.png', 'user_profile_info': ''}
 
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
@@ -240,10 +237,22 @@ def save_img():
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
-            file_path = f"profile_pics/{user_id}.{extension}"
-            file.save("./static/" + file_path)
+            file_path = os.environ.get("S3_URI")+"/{filename}"
+
             new_doc["user_profile_pic"] = filename
             new_doc["user_profile_pic_real"] = file_path
+
+            s3 = boto3.client('s3',
+                              aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID"),
+                              aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+                              )
+            s3.put_object(
+                ACL="public-read",
+                Bucket=os.environ.get("S3_BUCKET"),
+                Body=file,
+                Key=filename,
+                ContentType=extension)
+
         print(new_doc)
         db.user.update_one({'user_id': user_id}, {'$set': new_doc})
         return jsonify({"result": "success", 'msg': '프로필을 업데이트했습니다.'})
