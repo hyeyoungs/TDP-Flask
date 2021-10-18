@@ -16,36 +16,55 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
-    <title>Title</title>
+    <!-- cookie -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <title>Title | TIL.D.P</title>
 </head>
 <script>
 
+
     $(document).ready(function () {
-        listing();
-        ranking();
+        list_til();
+        rank_til();
+        state_home_switch({{ flag }})
     });
 
-    function listing() {
+    function state_home_switch(flag) {
+        if (flag === 0) {
+            $(".test").css("background-color",'red');
+        }
+        else if (flag === 1) {
+            $(".test").css("background-color",'blue');// display 속성을 block 으로 바꾼다.
+        }
+    }
+
+    function list_til() {
         $.ajax({
                 type: "GET",
-                url: "/home_listing",
+                url: "/til/board",
                 data: {},
                 success: function (response) {
-                    let home_til = response['home_til'];
-                    for (let i = 0; i < 4; i++) {
-                        let title = home_til[i]['til_title'];
-                        let user = home_til[i]['til_user'];
-                        let content = home_til[i]['til_content'];
-                        let day = home_til[i]['til_day'];
+                    let all_til = response['all_til'];
+                    let max = 4;
+                    if (response['til_count'] < 4) {
+                        max = response['til_count']
+                    }
+                    for (let i = 0; i < max; i++) {
+                        let title = all_til[i]['til_title'];
+                        let user = all_til[i]['til_user'];
+                        let content = all_til[i]['til_content'];
+                        let day = all_til[i]['til_day'];
                         let temp_html = `
                 <div class="col" id="cards-box">
-               <div class="card">
-                <h5 class="card-subtitle">${user}</h5>
-               <div class="card-body">
-                <h5 class="card-title">${title}</h5>
-                <p class="card-text">${content}</p>
-                <p class="card-time">${day} </p>
-                </div>
+                   <div class="card">
+                    <h5 class="card-subtitle">${user}</h5>
+                   <div class="card-body">
+                    <h5 class="card-title">${title}</h5>
+                    <p class="card-text">${content}</p>
+                    <p class="card-time">${day} </p>
+                    </div>
                   </div>
 `
                         $('#board-main').append(temp_html)
@@ -54,20 +73,19 @@
             }
         )
     }
-
-    function ranking() {
+    
+    function rank_til() {
         $.ajax({
                 type: "GET",
-                url: "/home_ranking",
+                url: "/til/rank",
                 data: {},
                 success: function (response) {
-                    let home_til = response['home_til'];
-                    for (let i = 0; i < home_til.length; i++) {
-                        let user = home_til[i]['_id'];
-                        let ranker = +1;
-                        let score = home_til[i]['til_score'];
+                    let til_rank = response['til_rank'];
+                    for (let i = 0; i < til_rank.length; i++) {
+                        let user = til_rank[i]['_id'];
+                        let score = til_rank[i]['til_score'];
                         let temp_html = `<tr>
-                                                <th>${ranker}</th>
+                                                <th>${i + 1}</th>
                                                 <th scope="row">${user}</th>
                                                 <td>${score}</td>
                                             </tr>
@@ -79,6 +97,13 @@
                 }
             }
         )
+    }
+
+    function sign_out() {
+        {#'mytoken', response['token']#}
+        $.removeCookie('mytoken', {path: '/'});
+        alert('로그아웃!')
+        window.location.href = "/"
     }
 
 </script>
@@ -106,11 +131,19 @@
         margin-left: 20px;
     }
 
+    .test {
+        float: left;
+        width: 200px;
+        height: 200px;
+        background-color: yellow;
+        display: block;
+    }
+
 </style>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">TIL.D.P</a>
+        <a class="navbar-brand" href="/main_page">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -120,8 +153,8 @@
                 <a class="nav-link " href="./til_board">Write TIL</a>
                 <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
-                <a class="nav-link" href="./">myPage</a>
-                <a class="nav-link" href="/">logout</a>
+                <a class="nav-link" href="./my_page">myPage</a>
+                <a class="nav-link" onclick="sign_out()">logout</a>
             </div>
         </div>
     </div>
@@ -145,16 +178,15 @@
 </div>
 <div class="left_write">
     <br><br>
+    <div class="test rounded-circle"></div><br>
     <h1>당신의 TIL 작성을</h1><br>
+    </div>
     <h1>관리해주는</h1><br>
 
     <h1>TIL 관리 서비스</h1>
-</div>
 <br>
 <br><br><br>
 <div class="row row-cols-3 row-cols-md-5 g-3 board-main" id="board-main">
-
-</div>
 </div>
 </body>
 </html>

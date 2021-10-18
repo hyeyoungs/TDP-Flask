@@ -15,66 +15,97 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
+    <script src="/js/jquery.twbsPagination.js"></script> <!-- jQuery -->
+    <script src="/js/jquery-3.6.0.min.js"></script> <!-- Bootstrap -->
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+
+
+    <!-- cookie -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <script>
+
         $(document).ready(function () {
-            listing();
+            read_all_til();
         });
 
-        function listing() {
-
+        function read_all_til() {
             $.ajax({
                     type: "GET",
-                    url: "/til_board_listing",
+                    url: "til/board",
                     data: {},
                     success: function (response) {
                         let all_til = response['all_til'];
                         for (let i = 0; i < all_til.length; i++) {
                             let title = all_til[i]['til_title'];
                             let user = all_til[i]['til_user'];
+                            let content = all_til[i]['til_content'];
                             let day = all_til[i]['til_day'];
-                            let temp_html = `<tr onClick="search('${title}')" style="cursor:pointer;">
+                            let til_idx = all_til[i]['til_idx']
+                            if (i < 5) {
+                                let temp_html = `<tr onClick="detail('${til_idx}')" style="cursor:pointer;">
+                                                <th scope="row">${title}<img src="{{ url_for('static', filename='new.png') }}" height="30" width="30"></th>
+                                                <td>${user}</td>
+                                                <td>${day}</td>
+                                                <td>${content}</td>
+                                            </tr>`
+
+                                $('#til-box').append(temp_html)
+
+                            } else {
+                                let temp_html = `<tr onClick="detail('${til_idx}')" style="cursor:pointer;">
                                                 <th scope="row">${title}</th>
                                                 <td>${user}</td>
                                                 <td>${day}</td>
+                                                <td>${content}</td>
                                             </tr>`
-                            $('#til-box').append(temp_html)
+                                $('#til-box').append(temp_html)
+                            }
                         }
                     }
                 }
             )
         }
 
-        function search(title) {
-            location.href = "http://localhost:5000/detail" + "?title=" + title;
+
+        function detail(til_idx) {
+            location.href = "http://localhost:5000/detail" + "?til_idx=" + til_idx;
         }
 
 
         function til_search() {
-            $('#til-table > tbody:last').empty();
-            let til_title = $('#search').val()
-
-            $.ajax({
-                type: "POST",
-                url: '/til_board',
-                data: {til_title: til_title},
-                success: function (response) {
-                    let find_til = response['til']
-                    for (let i = 0; i < find_til.length; i++) {
-                        let title = find_til[i]['til_title'];
-                        let user = find_til[i]['til_user'];
-                        let day = find_til[i]['til_day'];
-                        let temp_html = `<tr>
-                                                <th scope="row">${title}</th>
-                                                <td >${user}</td>
-                                                <td>${day}</td>
-
-                                            </tr>`
-                        $('#til-box').append(temp_html)
-                    }
-                }
-            })
+            let keyword = $('#keyword').val()
+            let setting = $('#setting-btn').text()
+            location.href = "http://localhost:5000/til_board_detail" + "?keyword=" + keyword + "&setting=" + setting;
+            //    로딩바 0.1초
         }
+
+
+        function search_setting(a) {
+            $('#setting-btn').text(a)
+        }
+
+        function sign_out() {
+            $.removeCookie('mytoken', {path: '/'});
+            alert('로그아웃!')
+            window.location.href = "/"
+        }
+        function makePaging(pagingInfo) {
+            let tempHtml = '';
+            for (let i = 0; i < pagingInfo['totalPage']; i++) {
+                if (i + 1 == pagingInfo['curPage']) {
+                    tempHtml += `<li class="page-item active"><a class="page-link" href="#">${i + 1}</a></li>`;
+                } else {
+                    tempHtml += `<li class="page-item"><a class="page-link" href="#" onclick="showArticles(${i + 1})">${i + 1}</a></li>`;
+                }
+            }
+            $("#pagination").html(tempHtml);
+        }
+
+
+
     </script>
 
     <style>
@@ -88,6 +119,14 @@
             width: 350px;
         }
 
+        .col-lg-6 {
+            margin: 50px auto;
+        }
+
+        .row {
+            float: right;
+        }
+
         .navbar-brand {
             margin-left: 50px;
         }
@@ -97,40 +136,47 @@
             margin-left: 100px;
         }
 
-
     </style>
 </head>
 
 
 <body>
+<!-- navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">TIL.D.P</a>
+        <a class="navbar-brand" href="/main_page">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div id="navbar-nav" class="navbar-nav">
+                <a class="nav-link " href="./til_board">Write TIL</a>
                 <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
-                <a class="nav-link" href="/">myPage</a>
-                <a class="nav-link" href="/">logout</a>
+                <a class="nav-link" href="./my_page">myPage</a>
+                <a class="nav-link" onclick="sign_out()">logout</a>
+                <a class="nav-link" onclick="goback()">Back</a>
             </div>
         </div>
     </div>
 </nav>
+
+
 <div class="container">
     <table class="table">
         <thead class="thead-light">
         <tr class="text-center">
             <th scope="col">TIL LIST</th>
-        </tr>
-        </thead>
-    </table>
 </div>
 
 <div class="wrap">
+    <div class="row">
+        <div class="col-auto mr-auto"></div>
+        <div class="col-auto">
+            <a class="btn btn-primary" href="create_page" role="button">글쓰기</a>
+        </div>
+    </div>
     <div class="container">
         <table id="til-table" class="table">
             <thead>
@@ -138,23 +184,28 @@
                 <th scope="col">제목</th>
                 <th scope="col">작성자</th>
                 <th scope="col">작성일</th>
+                <th scope="col">내용</th>
             </tr>
             </thead>
             <tbody id="til-box">
             </tbody>
         </table>
-        <a class="btn btn-primary" href="create_page" role="button">글쓰기</a>
-                <div class="input-box">
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon1">제목</span>
-                        </div>
-                        <input id="search" type="text" class="form-control" placeholder="검색어를 입력해주세요"
-                               aria-label="Username">
-                        <button onclick="til_search()" type="button" id="btn-search" class="btn btn-primary">검색</button>
-                    </div>
-                </div>
-            </div>
+        <div class="col-lg-6">
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button id="setting-btn" type="button" class="btn btn-default dropdown-toggle"
+                            data-toggle="dropdown" aria-expanded="false">제목<span class="caret"></span></button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a style="cursor:pointer" onclick="search_setting('제목')">제목</a></li>
+                        <li><a style="cursor:pointer" onclick="search_setting('작성자')">작성자</a></li>
+                        <li><a style="cursor:pointer" onclick="search_setting('내용')">내용</a></li>
+                    </ul>
+                </div><!-- /btn-group -->
+                <input id="keyword" type="text" class="form-control" placeholder="검색어를 입력해주세요" aria-label="...">
+                <button onclick="til_search()" type="button" id="btn-search" class="btn btn-primary">검색</button>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
+    </div>
 
 </div>
 </body>
