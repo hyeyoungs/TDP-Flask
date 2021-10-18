@@ -16,7 +16,11 @@
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
 
-    <title>Title</title>
+    <!-- cookie -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
+    <title>Title | TIL.D.P</title>
 </head>
 <script>
 
@@ -107,7 +111,7 @@
         {#'mytoken', response['token']#}
         $.removeCookie('mytoken', {path: '/'});
         alert('로그아웃!')
-        window.location.href = "/main_page"
+        window.location.href = "/"
     }
 </script>
 <style>
@@ -138,7 +142,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">TIL.D.P</a>
+        <a class="navbar-brand" href="/home">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -149,8 +153,7 @@
                 <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
                 <a class="nav-link" href="./my_page">myPage</a>
-                <a class="nav-link" onclick="sign_out()" href="/">logout</a>
-
+                <a class="nav-link" onclick="sign_out()">logout</a>
             </div>
         </div>
     </div>

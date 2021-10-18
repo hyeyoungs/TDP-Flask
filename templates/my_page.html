@@ -25,9 +25,11 @@
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+    <!-- cookie -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-        });
 
         function goback() {
             window.history.back();
@@ -62,24 +64,14 @@
         }
 
         function sign_out() {
-
+            $.removeCookie('mytoken', {path: '/'});
+            alert('로그아웃!')
+            window.location.href = "/"
         }
     </script>
     <style>
         body {
             background-color: #eeeeee;
-        }
-
-        .h7 {
-            font-size: 0.8rem;
-        }
-
-        .gedf-wrapper {
-            margin-top: 0.97rem;
-        }
-
-        @media (min-width: 992px) {
-
         }
 
         .navbar-brand {
@@ -98,6 +90,10 @@
             margin: auto;
         }
 
+        figure{
+            margin-right: 50px;
+        }
+
         /* Reset Bootstrap */
         .dropdown-toggle::after {
             content: none;
@@ -110,7 +106,7 @@
 <!-- navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">TIL.D.P</a>
+        <a class="navbar-brand" href="/home">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -121,7 +117,8 @@
                 <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
                 <a class="nav-link" href="./my_page">myPage</a>
-                <a class="nav-link" href="/">logout</a>
+                <a class="nav-link" onclick="sign_out()">logout</a>
+                <a class="nav-link" onclick="goback()">Back</a>
             </div>
         </div>
     </div>
@@ -242,5 +239,4 @@
         </div>
     </div>
 </section>
-
 </body>
