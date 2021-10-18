@@ -19,7 +19,6 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <style>
         body {
-            padding-top: 70px;
             padding-bottom: 30px;
         }
 
@@ -45,15 +44,14 @@
 
         function create_til() {
             let title = $('#title').val()
-            let user = $('#reg_id').val()
             let content = $('#content').val()
 
             $.ajax({
                 type: "POST",
                 url: "/til",
-                data: {til_user_give: user, til_title_give: title, til_content_give: content},
-                success: function () { // 성공하면
-                    location.href = "til_board";
+                data: {til_title_give: title, til_content_give: content},
+                success: function (response) { // 성공하면
+                    window.location.href = "http://localhost:5000/til_board"
                 }
             })
         }
@@ -71,9 +69,7 @@
 
     </script>
 </head>
-
 <body>
-<!-- navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="/home">TIL.D.P</a>
@@ -101,15 +97,12 @@
                 <label for="title">제목</label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력해 주세요">
             </div>
-
-            <div class="mb-3">
-                <label for="reg_id">작성자</label>
-                <input type="text" class="form-control" name="reg_id" id="reg_id" placeholder="이름을 입력해 주세요">
-            </div>
+            <p><span>작성자: </span><label for="content">{{ user_info.user_nickname }}</label><p>
             <div class="mb-3">
                 <label for="content">내용</label>
                 <textarea class="form-control" rows="5" name="content" id="content"
                           placeholder="내용을 입력해 주세요"></textarea>
+
             </div>
             <div class="mb-3">
                 <label for="tag">TAG</label>

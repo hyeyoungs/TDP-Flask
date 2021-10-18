@@ -44,7 +44,6 @@
         function create_comment() {
             let comment = $("#textarea-post").val()
             let today = new Date().toISOString()
-            {#let writer = payload[]#}
             let til_idx = {{til.til_idx}}
                 $.ajax({
                     type: "POST",
@@ -254,6 +253,17 @@
 
             margin-left: 100px;
         }
+        .level-left{
+            padding-left: 400px;
+        }
+        .til-title{
+            font-size: large;
+            margin: 30px auto;
+        }
+        .content-box{
+            text-align: center;
+            border-color: #37474F;
+        }
 
     </style>
 </head>
@@ -289,20 +299,21 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body">
-                    <div class="h5">{{ user_info.user_nickname }}</div>
-                    <div class="h7 text-muted">Fullname : {{ user_info.username }}</div>
-                    <div class="h7">Developer of web applications, JavaScript, PHP, Java, Python, Ruby, Java, Node.js,
-                        etc.
-                    </div>
+                    <span>닉네임</span>
+                    <div class="h5">{{ writer_info.user_nickname }}</div>
+                    <span>user_introduce</span>
+                    <div class="h7 text-muted">{{ writer_info.user_introduce }}</div>
+                    <span>github_id</span>
+                    <div class="h7 text-muted">{{ writer_info.github_id }}</div>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
                         <div class="h6 text-muted">Followers</div>
-                        <div class="h5">{{ user_info.user_followers }}</div>
+                        <div class="h5">{{ writer_info.user_followers }}</div>
                     </li>
                     <li class="list-group-item">
                         <div class="h6 text-muted">Followings</div>
-                        <div class="h5">{{ user_info.user_followings }}</div>
+                        <div class="h5">{{ writer_info.user_followings }}</div>
                     </li>
                     <li class="list-group-item">Sparta Coding</li>
                 </ul>
@@ -312,17 +323,18 @@
 
             <div class="box message-preview">
                 <div class="top">
-                    <div class="avatar"><img src="https://placehold.it/128x128"></div>
                     <div class="address">
-                        <p id="idx">{{ til.til_idx }}</p>
-                        <button type="button" onclick='new_box()' class="btn btn-primary two-button">수정</button>&nbsp;
-                        <button type="button" onclick='delete_til({{ til.til_idx }})'
-                                class="btn btn-primary two-button">삭제
-                        </button>
+                        {% if status %}
+                            <button type="button" onclick='new_box()' class="btn btn-primary two-button">수정</button>
+                            <button type="button" onclick='delete_til({{ til.til_idx }})'
+                                    class="btn btn-primary two-button">삭제</button>
+                        {% endif %}
 
-                        <div class="til" id="{{ til.til_idx }}">{{ til.til_title }}&nbsp;
-                            <nav class="level is-mobile">
+                        <div id="{{ til.til_idx }}">
+                            <div id="til-listing-box">
+                                <nav class="level is-mobile">
                                 <div class="level-left">
+                                    <span class="til-title">{{ til.til_title }}</span>
                                     <a class="level-item is-sparta" aria-label="heart"
                                        onclick="toggle_like({{ til.til_idx }}, 'heart')">
                                         <span class="icon is-small">
@@ -334,9 +346,14 @@
                                         <span class="like-num">{{ count }}</span>
                                     </a>
                                 </div>
-                            </nav>
+                                </nav>
+                                <div class="content-box" >
+                                    {{ til.til_content }}
+                                </div>
+
+                            </div>
+
                         </div>
-                        <div class="writer">{{ user_info.user_nickname }}</div>
 
                     </div>
 
@@ -371,14 +388,16 @@
                             <tbody id="til-box">
                             {% for now in comment %}
                                 <tr>
-                                    <td>{{ now.comment_writer }}</td>
+                                    <td>{{ now.user_id }}</td>
                                     <td>{{ now.til_comment }}</td>
                                     <td>{{ now.til_comment_day }}</td>
-                                    <td>
-                                        <button type="button" onclick='delete_comment({{ now.comment_idx }})'
-                                                class="btn btn-primary">삭제
-                                        </button>
-                                    </td>
+                                    {% if now.user_id == user_info.user_id %}
+                                        <td>
+                                            <button type="button" onclick='delete_comment({{ now.comment_idx }})'
+                                                    class="btn btn-primary">삭제
+                                            </button>
+                                        </td>
+                                    {% endif %}
                                 </tr>
                             {% endfor %}
                             </tbody>

@@ -15,6 +15,11 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
+    <script src="/js/jquery.twbsPagination.js"></script> <!-- jQuery -->
+    <script src="/js/jquery-3.6.0.min.js"></script> <!-- Bootstrap -->
+    <script src="/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+
 
     <!-- cookie -->
     <script type="text/javascript"
@@ -39,7 +44,7 @@
                             let content = all_til[i]['til_content'];
                             let day = all_til[i]['til_day'];
                             let til_idx = all_til[i]['til_idx']
-                            if (i < 7) {
+                            if (i < 5) {
                                 let temp_html = `<tr onClick="detail('${til_idx}')" style="cursor:pointer;">
                                                 <th scope="row">${title}<img src="{{ url_for('static', filename='new.png') }}" height="30" width="30"></th>
                                                 <td>${user}</td>
@@ -87,6 +92,18 @@
             alert('로그아웃!')
             window.location.href = "/"
         }
+        function makePaging(pagingInfo) {
+            let tempHtml = '';
+            for (let i = 0; i < pagingInfo['totalPage']; i++) {
+                if (i + 1 == pagingInfo['curPage']) {
+                    tempHtml += `<li class="page-item active"><a class="page-link" href="#">${i + 1}</a></li>`;
+                } else {
+                    tempHtml += `<li class="page-item"><a class="page-link" href="#" onclick="showArticles(${i + 1})">${i + 1}</a></li>`;
+                }
+            }
+            $("#pagination").html(tempHtml);
+        }
+
 
 
     </script>
