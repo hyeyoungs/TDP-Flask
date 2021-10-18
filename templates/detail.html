@@ -14,6 +14,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
             integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
             crossorigin="anonymous"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
             integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
@@ -31,6 +32,9 @@
 
     <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- cookie -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <script>
         $(document).ready(function () {
@@ -165,7 +169,11 @@
             }
         }
 
-
+        function sign_out() {
+            $.removeCookie('mytoken', {path: '/'});
+            alert('로그아웃!')
+            window.location.href = "/"
+        }
     </script>
 
     <style>
@@ -238,6 +246,15 @@
             text-align: center;
         }
 
+        .navbar-brand {
+            margin-left: 50px;
+        }
+
+        .nav-link {
+
+            margin-left: 100px;
+        }
+
     </style>
 </head>
 <body>
@@ -246,7 +263,7 @@
 <!-- navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">TIL.D.P</a>
+        <a class="navbar-brand" href="/home">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -254,23 +271,14 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div id="navbar-nav" class="navbar-nav">
                 <a class="nav-link " href="./til_board">Write TIL</a>
-                <a class="nav-link" href="#">My TIL</a>
+                <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
-                <a class="nav-link" href="/">logout</a>
+                <a class="nav-link" href="./my_page">myPage</a>
+                <a class="nav-link" onclick="sign_out()">logout</a>
+                <a class="nav-link" onclick="goback()">Back</a>
             </div>
         </div>
     </div>
-
-    <form class="form-inline">
-        <div class="input-group">
-            <input type="text" class="form-control" aria-label="Recipient's username" aria-describedby="button-addon2">
-            <div class="input-group-append">
-                <button class="btn btn-outline-primary" type="button" id="button-addon2">
-                    <i class="fa fa-search"></i>
-                </button>
-            </div>
-        </div>
-    </form>
 </nav>
 
 
@@ -281,8 +289,8 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body">
-                    <div class="h5">{{ userinfo.user_nickname }}</div>
-                    <div class="h7 text-muted">Fullname : {{ userinfo.username }}</div>
+                    <div class="h5">{{ user_info.user_nickname }}</div>
+                    <div class="h7 text-muted">Fullname : {{ user_info.username }}</div>
                     <div class="h7">Developer of web applications, JavaScript, PHP, Java, Python, Ruby, Java, Node.js,
                         etc.
                     </div>
@@ -290,11 +298,11 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
                         <div class="h6 text-muted">Followers</div>
-                        <div class="h5">{{ userinfo.user_followers }}</div>
+                        <div class="h5">{{ user_info.user_followers }}</div>
                     </li>
                     <li class="list-group-item">
                         <div class="h6 text-muted">Followings</div>
-                        <div class="h5">{{ userinfo.user_followings }}</div>
+                        <div class="h5">{{ user_info.user_followings }}</div>
                     </li>
                     <li class="list-group-item">Sparta Coding</li>
                 </ul>
@@ -303,7 +311,7 @@
         <div id="message-pane" class="column is-6 message hero is-fullheight">
 
             <div class="box message-preview">
-                <div class="top" >
+                <div class="top">
                     <div class="avatar"><img src="https://placehold.it/128x128"></div>
                     <div class="address">
                         <p id="idx">{{ til.til_idx }}</p>
@@ -317,14 +325,18 @@
                                 <div class="level-left">
                                     <a class="level-item is-sparta" aria-label="heart"
                                        onclick="toggle_like({{ til.til_idx }}, 'heart')">
-                                        <span class="icon is-small"><i class="fa fa-heart"
-                                                                       aria-hidden="true"></i></span>&nbsp;<span
-                                            class="like-num">2.7k</span>
+                                        <span class="icon is-small">
+                                            {% if action %}
+                                                <i class="fa fa-heart" aria-hidden="true"></i></span>&nbsp;
+                                            {% else %}
+                                                <i class="fa fa-heart-o" aria-hidden="true"></i></span>&nbsp;
+                                            {% endif %}
+                                        <span class="like-num">{{ count }}</span>
                                     </a>
                                 </div>
                             </nav>
                         </div>
-                        <div class="writer">{{ userinfo.user_nickname }}</div>
+                        <div class="writer">{{ user_info.user_nickname }}</div>
 
                     </div>
 

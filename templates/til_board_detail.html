@@ -16,6 +16,11 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
+
+    <!-- cookie -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+
     <style>
         .wrap {
             margin: 50px auto;
@@ -26,29 +31,41 @@
             margin: 50px auto;
             width: 350px;
         }
-        .col-lg-6{
+
+        .col-lg-6 {
             margin: 50px auto;
         }
-        .row{
+
+        .row {
             float: right;
         }
 
-</style>
+        .navbar-brand {
+            margin-left: 50px;
+        }
+
+        .nav-link {
+
+            margin-left: 100px;
+        }
+
+    </style>
+    <script>
+        function sign_out() {
+            $.removeCookie('mytoken', {path: '/'});
+            alert('로그아웃!')
+            window.location.href = "/"
+        }
+    </script>
 
 
 </head>
 
-
-
-
-
-
-
-
 <body>
+<!-- navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">TIL.D.P</a>
+        <a class="navbar-brand" href="/home">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -56,18 +73,15 @@
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div id="navbar-nav" class="navbar-nav">
                 <a class="nav-link " href="./til_board">Write TIL</a>
-                <a class="nav-link" href="#">My TIL</a>
+                <a class="nav-link" href="./mytil_page">My TIL</a>
                 <a class="nav-link" href="https://github.com/">Github</a>
                 <a class="nav-link" href="./my_page">myPage</a>
-                <a class="nav-link" href="/">logout</a>
-	    <a class="nav-link" onclick="goback()">Back</a>
+                <a class="nav-link" onclick="sign_out()">logout</a>
+                <a class="nav-link" onclick="goback()">Back</a>
             </div>
         </div>
     </div>
 </nav>
-
-
-
 
 
 <div class="container">
@@ -79,12 +93,11 @@
 
 <div class="wrap">
     <div class="row">
-            <div class="col-auto mr-auto"></div>
-            <div class="col-auto">
-                <a class="btn btn-primary" href="create_page" role="button">글쓰기</a>
-            </div>
+        <div class="col-auto mr-auto"></div>
+        <div class="col-auto">
+            <a class="btn btn-primary" href="create_page" role="button">글쓰기</a>
         </div>
-
+    </div>
 
 
     <div class="container">
@@ -99,9 +112,9 @@
             <tbody id="til-box">
             {% for now in til %}
                 <tr>
-                    <td>{{now.til_title}}</td>
-                    <td>{{now.til_user}}</td>
-                    <td>{{now.til_day}}</td>
+                    <td>{{ now.til_title }}</td>
+                    <td>{{ now.til_user }}</td>
+                    <td>{{ now.til_day }}</td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -119,8 +132,8 @@
                     <li><a style="cursor:pointer" onclick="search_setting('내용')">내용</a></li>
                 </ul>
             </div><!-- /btn-group -->
-                <input id="keyword" type="text" class="form-control" placeholder="검색어를 입력해주세요" aria-label="...">
-                <button onclick="til_search()" type="button" id="btn-search" class="btn btn-primary">검색</button>
+            <input id="keyword" type="text" class="form-control" placeholder="검색어를 입력해주세요" aria-label="...">
+            <button onclick="til_search()" type="button" id="btn-search" class="btn btn-primary">검색</button>
         </div><!-- /input-group -->
     </div><!-- /.col-lg-6 -->
 </div>
