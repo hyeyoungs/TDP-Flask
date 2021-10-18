@@ -43,7 +43,6 @@ def create_page():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
         return render_template('create.html', user_info=user_info)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
@@ -95,15 +94,19 @@ def detail_page():
         til_idx = int(til_idx)
         print(til_idx)
         til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
+        writer = db.til.find_one({'til_idx': til_idx}, {'_id': False})['til_user']
+        print(writer)
+        writer_info = db.user.find_one({"user_id": writer})
+        print(writer_info)
         comment = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
         like = list(db.like.find({"til_idx": til_idx}, {"_id": False}))
-        print(like)
         count = db.like.count_documents({"til_idx": til_idx, "type": 'heart'})
-        print(count)
         action = bool(db.like.find_one({"user_id": user_info['user_id'], "til_idx": til_idx}))
+        status = bool(db.til.find_one({"til_user": user_info['user_id'], "til_idx": til_idx}))
+
         return render_template('detail.html', user_info=user_info, til=til, comment=comment, like=like, count=count,
-                               action=action)
+                               action=action, status=status, writer_info=writer_info)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("login"))
 
@@ -128,7 +131,8 @@ def create_comment():
             'comment_idx': max_value,
             'til_idx': til_idx_receive,
             'til_comment': comment_receive,
-            'til_comment_day': date_receive
+            'til_comment_day': date_receive,
+            'user_nickmane' : user_info["user_nickname"]
         }
         db.comment.insert_one(doc)
         msg = "댓글작성 완료"
@@ -166,6 +170,9 @@ def search_detail_page():
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
     except jwt.exceptions.DecodeError:
         return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
+
+
+
 
 
 @app.route('/my_page')
@@ -211,21 +218,25 @@ def rank_til():
 
 @app.route('/til', methods=['POST'])
 def create_til():
-    til_user_receive = request.form['til_user_give']
-    til_title_receive = request.form['til_title_give']
-    til_content_receive = request.form['til_content_give']
-    til_count = db.til.count()
-    if til_count == 0:
-        max_value = 1
-    else:
-        max_value = db.til.find_one(sort=[("til_idx", -1)])['til_idx'] + 1
-    db.til.count()
-    doc = {'til_idx': max_value, 'til_title': til_title_receive, 'til_user': til_user_receive,
-           'til_content': til_content_receive,
-           'til_day': datetime.datetime.now(), 'til_view': True}
-    db.til.insert_one(doc)
-    return jsonify({'msg': 'til 작성 완료!'})
-
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        til_title_receive = request.form['til_title_give']
+        til_content_receive = request.form['til_content_give']
+        til_count = db.til.count()
+        if til_count == 0:
+            max_value = 1
+        else:
+            max_value = db.til.find_one(sort=[("til_idx", -1)])['til_idx'] + 1
+        db.til.count()
+        doc = {'til_idx': max_value, 'til_title': til_title_receive, 'til_user': user_info['user_id'],
+               'til_content': til_content_receive, 'til_day': datetime.datetime.now(), 'til_view': True}
+        db.til.insert_one(doc)
+        return jsonify({'msg': 'til 작성 완료!'})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+      
 
 @app.route('/til', methods=['GET'])
 def read_til():
