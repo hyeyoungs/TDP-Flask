@@ -15,7 +15,8 @@
             integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet"
+    <link href="
+    https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet"
           id="bootstrap-css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 
@@ -55,7 +56,7 @@
                 contentType: false,
                 processData: false,
                 success: function (response) {
-                    if (response["result"] == "success") {
+                    if (response["result"] === "success") {
                         alert(response["msg"]);
                         window.location.reload();
                     }
@@ -106,7 +107,7 @@
 <!-- navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/home">TIL.D.P</a>
+        <a class="navbar-brand" href="/main_page">TIL.D.P</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -130,7 +131,7 @@
         <article class="media">
             <figure style="align-self: center">
                 <a class="image is-96x96" href="#">
-                    <img class="is-rounded" src="{{ url_for('static', filename=user_info.user_profile_pic_real) }}">
+                    <img class="is-rounded" src="{{ user_info.user_profile_pic_real }}">
                 </a>
             </figure>
 
