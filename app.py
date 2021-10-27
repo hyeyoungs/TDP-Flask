@@ -91,6 +91,45 @@ def detail():
         return redirect(url_for("home"))
 
 
+@app.route('/detail', methods=['POST'])
+def detail():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        til_idx = request.args.get("til_idx")
+        til_idx = int(til_idx)
+
+        til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
+        writer = db.til.find_one({'til_idx': til_idx}, {'_id': False})['til_user']
+
+        writer_info = db.user.find_one({"user_id": writer})
+
+        comment = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        like = list(db.like.find({"til_idx": til_idx}, {"_id": False}))
+        count = db.like.count_documents({"til_idx": til_idx, "type": 'heart'})
+        action = bool(db.like.find_one({"user_id": user_info['user_id'], "til_idx": til_idx}))
+        status = bool(db.til.find_one({"til_user": user_info['user_id'], "til_idx": til_idx}))
+
+        doc = {
+            'user_info': user_info,
+            'til': til,
+            'comment': comment,
+            'like': like,
+            'count': count,
+            'action': action,
+            'status': status,
+            'writer_info': writer_info
+        }
+
+        return jsonify({'result': "success", 'all': doc})
+
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
+
+
+
 @app.route('/til/comment', methods=['POST'])
 def create_comment():
     token_receive = request.cookies.get('mytoken')
@@ -218,10 +257,7 @@ def create_til():
         db.til.insert_one(doc)
         return jsonify({'msg': 'til 작성 완료!'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-        return redirect(url_for("home"))
-
-
-
+        return redirect(url_for("login"))
 
 
 @app.route('/til', methods=['GET'])
