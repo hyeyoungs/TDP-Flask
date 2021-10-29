@@ -34,13 +34,31 @@
     </style>
     <script>
         $(document).ready(function () {
-            board_user_find();
+            append_user_nickname();
+            {#console.log(get_cookie("mytoken"))#}
         });
 
         $(document).on('click', '#btnSave', function (e) {
             e.preventDefault();
             $("#form").submit();
         });
+
+        function read_user() {
+            $.ajax({
+                type: "GET",
+                url: "/user",
+                async: false,
+                success: function (response) {
+                    user_info = response['user_info'];
+                }
+            });
+            return user_info;
+        }
+
+        async function append_user_nickname() {
+            let user_info = await read_user();
+            $('#user_nickname_append').text(user_info['user_nickname']);
+        }
 
         function create_til() {
             let title = $('#title').val()
@@ -97,7 +115,7 @@
                 <label for="title">제목</label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력해 주세요">
             </div>
-            <p><span>작성자: </span><label for="content">{{ user_info.user_nickname }}</label><p>
+            <p><span>작성자: </span><label for="content" id="user_nickname_append"></label><p>
             <div class="mb-3">
                 <label for="content">내용</label>
                 <textarea class="form-control" rows="5" name="content" id="content"

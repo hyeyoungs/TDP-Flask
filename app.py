@@ -57,7 +57,6 @@ def home():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
         til_state = list(db.til.find({"til_user": payload["id"]}, {"til_day": 1, "_id": False}))
         today = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -172,9 +171,6 @@ def search_detail_page():
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
     except jwt.exceptions.DecodeError:
         return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
-
-
-
 
 
 @app.route('/my_page')
@@ -320,6 +316,18 @@ def create_user():
 
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
+
+
+@app.route('/user', methods=['GET'])
+def read_user():
+    token_receive = request.cookies.get('mytoken')
+    print(token_receive)
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False, "user_password": False})
+        return jsonify({'result': 'success', 'user_info': user_info})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
 
 
 @app.route('/login', methods=['POST'])
