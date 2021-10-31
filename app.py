@@ -177,9 +177,6 @@ def search_detail_page():
         return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
 
 
-
-
-
 @app.route('/my_page')
 def my_page():
     token_receive = request.cookies.get('mytoken')
@@ -323,6 +320,18 @@ def create_user():
 
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
+
+
+@app.route('/user', methods=['GET'])
+def read_user():
+    token_receive = request.cookies.get('mytoken')
+    print(token_receive)
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False, "user_password": False})
+        return jsonify({'result': 'success', 'user_info': user_info})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
 
 
 @app.route('/login', methods=['POST'])
