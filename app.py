@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 
 config = configparser.ConfigParser()
-base_dir = "/Users/hyeyoung/C.D.P.ConfigValue"
+base_dir = "D:\새 폴더\C.D.P.ConfigValue"
 config.read(os.path.join(base_dir, 'config.cnf'))
 
 
@@ -52,12 +52,10 @@ def create_page():
 
 
 @app.route('/main_page')
-def home():
-    flag = 0
+def home(flag=None):
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
         til_state = list(db.til.find({"til_user": payload["id"]}, {"til_day": 1, "_id": False}))
         today = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -68,11 +66,16 @@ def home():
                 break
             else:
                 flag = 0
+                # flag를 json으로 넘기자.
+                # js로 mytoken 값이 있는가 없는가
+                # 로그인 -> main -api호출 -> 또 api호출
+                #loading bar ->
         return render_template('home.html', user_info=user_info, flag=flag)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("login"))
 
 
+        # 가져오기 def
 @app.route('/til_board')
 def list_page():
     token_receive = request.cookies.get('mytoken')
