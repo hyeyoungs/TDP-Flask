@@ -111,6 +111,44 @@ def detail_page():
                                action=action, status=status, writer_info=writer_info)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("login"))
+    
+
+@app.route('/detail', methods=['GET'])
+def detail():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        til_idx = request.args.get("til_idx")
+        til_idx = int(til_idx)
+
+        til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
+        writer = db.til.find_one({'til_idx': til_idx}, {'_id': False})['til_user']
+
+        writer_info = db.user.find_one({"user_id": writer})
+
+        comment = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        like = list(db.like.find({"til_idx": til_idx}, {"_id": False}))
+        count = db.like.count_documents({"til_idx": til_idx, "type": 'heart'})
+        action = bool(db.like.find_one({"user_id": user_info['user_id'], "til_idx": til_idx}))
+        status = bool(db.til.find_one({"til_user": user_info['user_id'], "til_idx": til_idx}))
+
+        doc = {
+            'user_info': user_info,
+            'til': til,
+            'comment': comment,
+            'like': like,
+            'count': count,
+            'action': action,
+            'status': status,
+            'writer_info': writer_info
+        }
+
+        return jsonify({'result': "success", 'all': doc})
+
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("home"))
+
 
 
 @app.route('/til/comment', methods=['POST'])
@@ -143,12 +181,26 @@ def create_comment():
         return redirect(url_for("home"))
 
 
+@app.route('/til/comment', methods=['GET'])
+def read_comment():
+    idx = request.args['idx']
+    temp = list(db.comment.find({'til_idx': int(idx)}, {'_id': False}, {'user_id': False}))
+    til_writer_nickname = db.til.find_one({'til_idx': int(idx)}, {'_id': False}, {'user_id': False})['user_nickname']
+    return jsonify({"comment": temp, 'til_writer_nickname': til_writer_nickname})
+
+
 @app.route('/til/comment', methods=['DELETE'])
 def delete_comment():
     comment_idx_receive = request.form['comment_idx_give']
     comment_idx_receive = int(comment_idx_receive)
     db.comment.delete_one({'comment_idx': comment_idx_receive})
-    return jsonify({'result': "success", 'msg': '삭제 완료'})
+    return jsonify({'result': "success", 'msg': '삭제 완료'}) @app.route('/til', methods=['GET'])
+
+
+def read_til():
+    idx = request.args['idx']
+    doc = db.til.find_one({'til_idx': int(idx)}, {'_id': False})
+    return jsonify({"til": doc})
 
 
 @app.route('/til_board_detail')
@@ -245,6 +297,46 @@ def read_til():
     idx = request.args['idx']
     doc = db.til.find_one({'til_idx': int(idx)}, {'_id': False})
     return jsonify({"til": doc})
+
+
+@app.route('/til/user', methods=['GET'])
+def read_user():
+    idx = request.args['idx']
+    user_id = db.til.find_one({'til_idx': int(idx)}, {'_id': False})['til_user']
+    user_info = db.user.find_one({'user_id': user_id}, {'id': False}, )
+    user_nickname = user_info['user_nickname']
+    github_id = user_info['githhub_id']
+    user_profile_info = user_info['user_profile_info']
+    return jsonify({"user_nickname": user_nickname, 'githhub_id': github_id, 'user_profile_info': user_profile_info})
+
+
+@app.route('/heart', methods=['GET'])
+def read_heart():
+    idx = request.args['idx']
+    user_id = db.til.find_one({'til_idx': int(idx)}, {'_id': False})['til_user']
+    user_info = db.user.find_one({'user_id': user_id}, {'id': False}, )
+    user_nickname = user_info['user_nickname']
+    github_id = user_info['githhub_id']
+    user_profile_info = user_info['user_profile_info']
+    return jsonify({"user_nickname": user_nickname, 'githhub_id': github_id, 'user_profile_info': user_profile_info})
+
+
+@app.route('/status', methods=['GET'])
+def read_status():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        now_user_id = db.user.find_one({"user_id": payload["id"]}, {"_id": False})['user_id']
+
+        idx = request.args['idx']
+        user_id = db.til.find_one({'til_idx': int(idx)}, {'_id': False})['til_user']
+        til_user_id = db.user.find_one({'user_id': user_id}, {'id': False})['user_id']
+        
+        status = bool(now_user_id == til_user_id)
+        return jsonify({"status": status})
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
 
 
 @app.route('/til/<idx>', methods=['DELETE'])

@@ -39,62 +39,147 @@
     <script>
         $(document).ready(function () {
             $('#new-box').hide();
-            all_page();
+            get_til();
+            status();
         });
-
-        function all_page() {
+        var idx;
+        function get_status() {
             $.ajax({
-                    type: "POST",
-                    url: "/detail",
-                    data: {},
-                    success: function (response) {
-                        let all_til = response['all_til'];
-                        for (let i = 0; i < all_til.length; i++) {
-                            let title = all_til[i]['til_title'];
-                            let user = all_til[i]['til_user'];
-                            let content = all_til[i]['til_content'];
-                            let day = all_til[i]['til_day'];
-                            let til_idx = all_til[i]['til_idx']
-                            if (i < 5) {
-                                let temp_html = `<tr onClick="detail('${til_idx}')" style="cursor:pointer;">
-                                                <th scope="row">${title}<img src="{{ url_for('static', filename='new.png') }}" height="30" width="30"></th>
-                                                <td>${user}</td>
-                                                <td>${day}</td>
-                                                <td>${content}</td>
-                                            </tr>`
-
-                                $('#til-box').append(temp_html)
-
-                            } else {
-                                let temp_html = `<tr onClick="detail('${til_idx}')" style="cursor:pointer;">
-                                                <th scope="row">${title}</th>
-                                                <td>${user}</td>
-                                                <td>${day}</td>
-                                                <td>${content}</td>
-                                            </tr>`
-                                $('#til-box').append(temp_html)
-                            }
-
-
-                        }
+                type: "GET",
+                url: `/status`,
+                data: {},
+                success: function (response) {
+                    let status = response['status']
+                    if (status) {
+                        let temp_html =
+                            `<button type="button" onclick='new_box()' class="btn btn-primary two-button">수정</button>
+                            <button type="button" onclick='delete_til()' class="btn btn-primary two-button">삭제</button>`
+                        $('#mine').append(temp_html)
                     }
                 }
-            )
+            });
+        }
+        function get_heart() {
+            $.ajax({
+                type: "GET",
+                url: `/heart`,
+                data: {},
+                success: function (response) {
+                    let title = response['til']['til_title']
+                    let content = response['til']['til_content']
+                    let user = response['til']['til_user']
+                    idx = response['til']['til_idx']
+                    $("#til-title").val(title);
+                    $("#til-content").val(content);
+
+
+
+                }
+            });
         }
 
+
+        function get_til() {
+            $.ajax({
+                type: "GET",
+                url: `/til`,
+                async: false,
+                data: {},
+                success: function (response) {
+                    let title = response['til']['til_title']
+                    let content = response['til']['til_content']
+                    let user = response['til']['til_user']
+                    idx = response['til']['til_idx']
+                    $("#til-title").val(title);
+                    $("#til-content").val(content);
+
+
+
+                }
+            });
+        }
+
+        function get_user() {
+            $.ajax({
+                type: "GET",
+                url: `/til/user`,
+                data: {},
+                success: function (response) {
+                    let nickname = response['user_nickname']
+                    let githhub_id = response['githhub_id']
+                    let profile = response['user_profile_info']
+
+                    $("#user-nickname").val(nickname);
+                    $("#user-githhub_id").val(githhub_id);
+                    $("#user-profile").val(profile);
+
+                }
+            });
+        }
+
+        function get_comment() {
+            $.ajax({
+                type: "GET",
+                url: `/til/comment`,
+                data: {},
+                success: function (response) {
+                    let til_writer_nickname = response['til_writer_nickname']
+                    let comment = response['comment'];
+                    for (let i = 0; i < comment.length; i++) {
+                        let comment = comment[i]['til_comment']
+                        let day = comment[i]['til_comment_day']
+                        let commenter = comment[i]['user_nickmane']
+                        let til_idx = comment[i]['til_idx']
+                        let comment_idx = comment[i]['comment_idx']
+
+
+                        if (commenter == til_writer_nickname) {
+                            let temp_html =
+                                `<tr>
+                                <td>${commenter}</td>
+                                <td>${comment}</td>
+                                <td>${day}</td>
+                                <td>
+                                    <button type="button" onclick='delete_comment('${comment_idx}')'
+                                            class="btn btn-primary">삭제
+                                    </button>
+                                </td>
+                                </tr>`
+
+                            $('#comment-box').append(temp_html)
+
+                        } else {
+                            let temp_html =
+                                `<tr>
+                                <td>${commenter}</td>
+                                <td>${comment}</td>
+                                <td>${day}</td>
+                                </tr>`
+
+                            $('#comment-box').append(temp_html)
+                        }
+
+
+                    }
+
+
+                }
+            });
+        }
 
 
         function create_comment() {
             let comment = $("#textarea-post").val()
             let today = new Date().toISOString()
-            let til_idx = {{til.til_idx}}
+            let til_idx =
+
                 $.ajax({
                     type: "POST",
                     url: "/til/comment",
                     data: {
                         comment_give: comment,
                         date_give: today,
-                        til_idx_give: til_idx
+                        til_idx_give: idx
                     },
                     success: function (response) {
                         alert(response['msg'])
@@ -174,8 +259,9 @@
             $('#new-box').hide();
         }
 
-        function toggle_like(til_idx, type) {
-            console.log(til_idx, type)
+        function toggle_like(type) {
+            let til_idx = idx
+            console.log(type)
             let $a_like = $(`#${til_idx} a[aria-label='heart']`)
             let $i_like = $a_like.find("i")
             if ($i_like.hasClass("fa-heart")) {
@@ -297,14 +383,17 @@
 
             margin-left: 100px;
         }
-        .level-left{
+
+        .level-left {
             padding-left: 400px;
         }
-        .til-title{
+
+        .til-title {
             font-size: large;
             margin: 30px auto;
         }
-        .content-box{
+
+        .content-box {
             text-align: center;
             border-color: #37474F;
         }
@@ -344,20 +433,20 @@
             <div class="card">
                 <div class="card-body">
                     <span>닉네임</span>
-                    <div class="h5">{{ writer_info.user_nickname }}</div>
+                    <div id="user-nickname" class="h5">user_nickname 내용</div>
                     <span>user_introduce</span>
-                    <div class="h7 text-muted">{{ writer_info.user_introduce }}</div>
+                    <div id="user-pfofile" class="h7 text-muted">user_introduce 내용</div>
                     <span>github_id</span>
-                    <div class="h7 text-muted">{{ writer_info.github_id }}</div>
+                    <div id="user-githhub_id" class="h7 text-muted">github_id 내용</div>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
                         <div class="h6 text-muted">Followers</div>
-                        <div class="h5">{{ writer_info.user_followers }}</div>
+                        <div class="h5"></div>
                     </li>
                     <li class="list-group-item">
                         <div class="h6 text-muted">Followings</div>
-                        <div class="h5">{{ writer_info.user_followings }}</div>
+                        <div class="h5"></div>
                     </li>
                     <li class="list-group-item">Sparta Coding</li>
                 </ul>
@@ -368,31 +457,28 @@
             <div class="box message-preview">
                 <div class="top">
                     <div class="address">
-                        {% if status %}
-                            <button type="button" onclick='new_box()' class="btn btn-primary two-button">수정</button>
-                            <button type="button" onclick='delete_til({{ til.til_idx }})'
-                                    class="btn btn-primary two-button">삭제</button>
-                        {% endif %}
+                        <div id="mine">
+                        </div>
 
-                        <div id="{{ til.til_idx }}">
+                        <div>
                             <div id="til-listing-box">
                                 <nav class="level is-mobile">
-                                <div class="level-left">
-                                    <span class="til-title">{{ til.til_title }}</span>
-                                    <a class="level-item is-sparta" aria-label="heart"
-                                       onclick="toggle_like({{ til.til_idx }}, 'heart')">
+                                    <div class="level-left">
+                                        <span class="til-title" id="til-title">til-title</span>
+                                        <a class="level-item is-sparta" aria-label="heart"
+                                           onclick="toggle_like(idx, 'heart')">
                                         <span class="icon is-small">
                                             {% if action %}
                                                 <i class="fa fa-heart" aria-hidden="true"></i></span>&nbsp;
                                             {% else %}
-                                                <i class="fa fa-heart-o" aria-hidden="true"></i></span>&nbsp;
+                                            <i class="fa fa-heart-o" aria-hidden="true"></i></span>&nbsp;
                                             {% endif %}
-                                        <span class="like-num">{{ count }}</span>
-                                    </a>
-                                </div>
+                                            <span class="like-num">count</span>
+                                        </a>
+                                    </div>
                                 </nav>
-                                <div class="content-box" >
-                                    {{ til.til_content }}
+                                <div id="til-content" class="content-box">
+                                    til_content
                                 </div>
 
                             </div>
@@ -411,7 +497,7 @@
                             <textarea class="form-control" id="new-til-content"
                                       rows="8">{{ til.til_content }}</textarea><br>
                             <p id="new-content-button"><span class="two-button">
-                                <button type="button" onclick='update_til({{ til.til_idx }})'
+                                <button type="button" onclick='update_til()'
                                         class="btn btn-primary">변경</button>
                                 <button type="button" onclick='cancle()' class="btn btn-primary">취소</button>
                             </span></p>
@@ -426,24 +512,12 @@
                         <table id="til-table" class="table">
                             <thead>
                             <tr>
-                                {#                                <th scope="col">작성자</th>#}
+                                {#
+                                <th scope="col"></th>
+                                #}
                             </tr>
                             </thead>
-                            <tbody id="til-box">
-                            {% for now in comment %}
-                                <tr>
-                                    <td>{{ now.user_id }}</td>
-                                    <td>{{ now.til_comment }}</td>
-                                    <td>{{ now.til_comment_day }}</td>
-                                    {% if now.user_id == user_info.user_id %}
-                                        <td>
-                                            <button type="button" onclick='delete_comment({{ now.comment_idx }})'
-                                                    class="btn btn-primary">삭제
-                                            </button>
-                                        </td>
-                                    {% endif %}
-                                </tr>
-                            {% endfor %}
+                            <tbody id="comment-box">
                             </tbody>
                         </table>
                     </div>
