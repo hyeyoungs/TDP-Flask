@@ -1,4 +1,4 @@
-import boto3, os, jwt, datetime, hashlib, configparser
+import boto3, os, jwt, datetime, hashlib
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from werkzeug.utils import secure_filename
 from pymongo import MongoClient
@@ -6,12 +6,7 @@ from pymongo import MongoClient
 app = Flask(__name__)
 
 
-config = configparser.ConfigParser()
-base_dir = "/Users/hyeyoung/C.D.P.ConfigValue"
-config.read(os.path.join(base_dir, 'config.cnf'))
-
-
-client = MongoClient(config['DB']['MONGO_DB_PATH'])
+client = MongoClient(os.environ.get("MONGO_DB_PATH"))
 db = client.tdp
 
 SECRET_KEY = 'CodingDeserterPursuit'
@@ -57,7 +52,6 @@ def home():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
         til_state = list(db.til.find({"til_user": payload["id"]}, {"til_day": 1, "_id": False}))
         today = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -224,9 +218,6 @@ def search_detail_page():
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
     except jwt.exceptions.DecodeError:
         return jsonify({'result': 'fail', 'msg': '로그인 정보가 존재하지 않습니다.'})
-
-
-
 
 
 @app.route('/my_page')
@@ -414,6 +405,18 @@ def create_user():
     return jsonify({'result': 'success'})
 
 
+@app.route('/user', methods=['GET'])
+def read_user():
+    token_receive = request.cookies.get('mytoken')
+    print(token_receive)
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False, "user_password": False})
+        return jsonify({'result': 'success', 'user_info': user_info})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
+
+
 @app.route('/login', methods=['POST'])
 def login():
     user_id_receive = request.form['user_id_give']
@@ -457,17 +460,17 @@ def save_img():
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
-            file_path = config['AWS']['S3_URI']+filename
+            file_path = os.environ.get("S3_URI")+"/{filename}"
 
             new_doc["user_profile_pic"] = filename
             new_doc["user_profile_pic_real"] = file_path
             s3 = boto3.client('s3',
-                              aws_access_key_id = config['AWS']['AWS_ACCESS_KEY_ID'],
-                              aws_secret_access_key = config['AWS']['AWS_SECRET_ACCESS_KEY']
+                              aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID"),
+                              aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
                               )
             s3.put_object(
                 ACL="public-read",
-                Bucket=config['AWS']['S3_BUCKET'],
+                Bucket=os.environ.get("S3_BUCKET"),
                 Body=file,
                 Key=filename,
                 ContentType=extension)
