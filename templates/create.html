@@ -34,8 +34,7 @@
     </style>
     <script>
         $(document).ready(function () {
-            append_user_nickname();
-            {#console.log(get_cookie("mytoken"))#}
+            read_user_profile();
         });
 
         $(document).on('click', '#btnSave', function (e) {
@@ -55,10 +54,21 @@
             return user_info;
         }
 
-        async function append_user_nickname() {
+        async function read_user_profile(){
             let user_info = await read_user();
-            $('#user_nickname_append').text(user_info['user_nickname']);
+            $('.user_id_append').text(user_info['user_id']);
+            $('.user_nickname_append').text(user_info['user_nickname']);
+            $('.user_profile_info_append').text(user_info['user_profile_info']);
+            $('.user_profile_pic_append').text(user_info['user_profile_pic']);
+            $('.github_id_append').text(user_info['github_id']);
+            $('.user_id_append').val(user_info['user_id']);
+            $('.user_nickname_append').val(user_info['user_nickname']);
+            $('.user_profile_info_append').val(user_info['user_profile_info']);
+            $('.user_profile_pic_append').val(user_info['user_profile_pic']);
+            $('.user_profile_pic_real_append').attr('src', user_info['user_profile_pic_real']);
+            $('.github_id_append').val(user_info['github_id']);
         }
+
 
         function create_til() {
             let title = $('#title').val()
@@ -115,7 +125,7 @@
                 <label for="title">제목</label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력해 주세요">
             </div>
-            <p><span>작성자: </span><label for="content" id="user_nickname_append"></label><p>
+            <p><span>작성자: </span><label for="content" class="user_nickname_append"></label><p>
             <div class="mb-3">
                 <label for="content">내용</label>
                 <textarea class="form-control" rows="5" name="content" id="content"
