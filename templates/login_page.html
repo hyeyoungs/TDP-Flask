@@ -439,9 +439,6 @@
 
 
         function login() {
-            {% if msg %}
-                alert("{{ msg }}")
-            {% endif %}
             $.ajax({
                 type: "POST",
                 url: "/login",
