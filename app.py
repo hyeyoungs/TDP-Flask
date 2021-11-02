@@ -137,6 +137,7 @@ def read_comment(idx):
 
 @app.route('/til/comment', methods=['DELETE'])
 def delete_comment():
+
     comment_idx_receive = request.form['comment_idx_give']
     comment_idx_receive = int(comment_idx_receive)
     db.comment.delete_one({'comment_idx': comment_idx_receive})
