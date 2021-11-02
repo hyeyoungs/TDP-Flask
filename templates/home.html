@@ -28,18 +28,34 @@
     $(document).ready(function () {
         list_til();
         rank_til();
-        state_home_switch({{ flag }})
+        state_home_switch();
     });
 
-    function state_home_switch(flag) {
+    function read_flag() {
+        $.ajax({
+                type: "GET",
+                url: "/flag",
+                data: {},
+                async: false,
+                success: function (response) {
+                    flag = response['flag'];
+                    console.log(flag)
+                }
+            }
+        )
+        return flag;
+    }
 
+    async function state_home_switch() {
+        let flag = await read_flag();
+        console.log(flag)
         if (flag === 0) {
-            $(".test").css("background-color",'red');
-        }
-        else if (flag === 1) {
-            $(".test").css("background-color",'blue');// display 속성을 block 으로 바꾼다.
+            $(".test").css("background-color", 'red');
+        } else if (flag === 1) {
+            $(".test").css("background-color", 'blue');// display 속성을 block 으로 바꾼다.
         }
     }
+
 
     function list_til() {
         $.ajax({
@@ -179,12 +195,13 @@
 </div>
 <div class="left_write">
     <br><br>
-    <div class="test rounded-circle"></div><br>
+    <div class="test rounded-circle"></div>
+    <br>
     <h1>당신의 TIL 작성을</h1><br>
-    </div>
-    <h1>관리해주는</h1><br>
+</div>
+<h1>관리해주는</h1><br>
 
-    <h1>TIL 관리 서비스</h1>
+<h1>TIL 관리 서비스</h1>
 <br>
 <br><br><br>
 <div class="row row-cols-3 row-cols-md-5 g-3 board-main" id="board-main">
