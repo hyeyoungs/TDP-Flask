@@ -5,7 +5,6 @@ from pymongo import MongoClient
 
 app = Flask(__name__)
 
-
 client = MongoClient(os.environ.get("MONGO_DB_PATH"))
 db = client.tdp
 
@@ -46,25 +45,43 @@ def create_page():
         return redirect(url_for("login"))
 
 
-@app.route('/main_page')
-def home():
-    flag = 0
+@app.route('/detail')
+def detail_page():
     token_receive = request.cookies.get('mytoken')
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
-        til_state = list(db.til.find({"til_user": payload["id"]}, {"til_day": 1, "_id": False}))
-        today = datetime.datetime.now().strftime('%Y-%m-%d')
-        for doc in til_state:
-            old_day = doc['til_day'].strftime('%Y-%m-%d')
-            if today == old_day:
-                flag = 1
-                break
-            else:
-                flag = 0
-        return render_template('home.html', user_info=user_info, flag=flag)
+        return render_template('detail.html', user_info=user_info)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("login"))
+
+
+@app.route('/main_page')
+def home():
+    token_receive = request.cookies.get('mytoken')
+    try:
+        jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        return render_template('home.html')
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
+
+
+@app.route('/flag', methods=['GET'])
+def read_flag():
+    flag = 0
+    token_receive = request.cookies.get('mytoken')
+    payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+    til_state = list(db.til.find({"til_user": payload["id"]}, {"til_day": 1, "_id": False}))
+    today = datetime.datetime.now().strftime('%Y-%m-%d')
+    for doc in til_state:
+        old_day = doc['til_day'].strftime('%Y-%m-%d')
+        if today == old_day:
+            flag = 1
+            break
+        else:
+            flag = 0
+    print(flag)
+    return jsonify({'flag': flag})
 
 
 @app.route('/til_board')
@@ -75,34 +92,6 @@ def list_page():
 
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
         return render_template('til_board.html', user_info=user_info)
-    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
-        return redirect(url_for("login"))
-
-
-@app.route('/detail')
-def detail_page():
-    token_receive = request.cookies.get('mytoken')
-    title = request.args.get("title")
-    content = db.til.find_one({'til_title': title}, {'_id': False})
-    try:
-        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
-        til_idx = request.args.get("til_idx")
-        til_idx = int(til_idx)
-        print(til_idx)
-        til = db.til.find_one({'til_idx': til_idx}, {'_id': False})
-        writer = db.til.find_one({'til_idx': til_idx}, {'_id': False})['til_user']
-        print(writer)
-        writer_info = db.user.find_one({"user_id": writer})
-        print(writer_info)
-        comment = list(db.comment.find({'til_idx': til_idx}, {'_id': False}))
-        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
-        like = list(db.like.find({"til_idx": til_idx}, {"_id": False}))
-        count = db.like.count_documents({"til_idx": til_idx, "type": 'heart'})
-        action = bool(db.like.find_one({"user_id": user_info['user_id'], "til_idx": til_idx}))
-        status = bool(db.til.find_one({"til_user": user_info['user_id'], "til_idx": til_idx}))
-
-        return render_template('detail.html', user_info=user_info, til=til, comment=comment, like=like, count=count,
-                               action=action, status=status, writer_info=writer_info)
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("login"))
 
@@ -128,7 +117,7 @@ def create_comment():
             'til_idx': til_idx_receive,
             'til_comment': comment_receive,
             'til_comment_day': date_receive,
-            'user_nickmane' : user_info["user_nickname"]
+            'user_nickmane': user_info["user_nickname"]
         }
         db.comment.insert_one(doc)
         msg = "댓글작성 완료"
@@ -137,8 +126,24 @@ def create_comment():
         return redirect(url_for("home"))
 
 
+@app.route('/til/comment/<idx>', methods=['GET'])
+def read_comment(idx):
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False})
+        temp = list(db.comment.find({'til_idx': int(idx)}, {'_id': False, 'user_id': False}))
+        print(temp)
+        writer = user_info['user_nickname']
+        print(writer)
+        return jsonify({'comment': temp, 'writer': writer})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
+
+
 @app.route('/til/comment', methods=['DELETE'])
 def delete_comment():
+
     comment_idx_receive = request.form['comment_idx_give']
     comment_idx_receive = int(comment_idx_receive)
     db.comment.delete_one({'comment_idx': comment_idx_receive})
@@ -186,7 +191,7 @@ def read_all_til():
     return jsonify({'result': "success", 'all_til': temp, "til_count": til_count})
 
 
-@app.route('/til/user', methods=['POST'])
+@app.route('/til/user/', methods=['POST'])
 def read_user_til():
     til_user_receive = request.form['til_user_give']
     my_til = list(db.til.find({'til_user': til_user_receive}, {'_id': False}).sort('_id', -1))
@@ -203,8 +208,8 @@ def rank_til():
             }},
         {"$sort":
             {
-                 'til_score': -1}
-         }
+                'til_score': -1}
+        }
     ]))
     return jsonify({'result': "success", 'til_rank': agg_result})
 
@@ -229,13 +234,54 @@ def create_til():
         return jsonify({'msg': 'til 작성 완료!'})
     except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
         return redirect(url_for("home"))
-      
 
-@app.route('/til', methods=['GET'])
-def read_til():
-    idx = request.args['idx']
+
+@app.route('/til/<idx>', methods=['GET'])
+def read_til(idx):
     doc = db.til.find_one({'til_idx': int(idx)}, {'_id': False})
     return jsonify({"til": doc})
+
+
+@app.route('/til/user/<idx>', methods=['GET'])
+def read_til_user(idx):
+    user_id = db.til.find_one({'til_idx': int(idx)}, {'_id': False})['til_user']
+    user_info = db.user.find_one({'user_id': user_id}, {'id': False}, )
+    user_nickname = user_info['user_nickname']
+    github_id = user_info['githhub_id']
+    user_profile_info = user_info['user_profile_info']
+    return jsonify({"user_nickname": user_nickname, 'githhub_id': github_id, 'user_profile_info': user_profile_info})
+
+
+@app.route('/heart/<idx>', methods=['GET'])
+def read_heart(idx):
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        user_id = db.user.find_one({"user_id": payload["id"]}, {"_id": False})['user_id']
+
+        count = db.like.count_documents({"til_idx": int(idx), "type": 'heart'})
+        action = bool(db.like.find_one({"user_id": user_id, "til_idx": int(idx)}))
+        print(count)
+        print(action)
+        return jsonify({'count': count, 'action': action})
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
+
+
+@app.route('/status/<idx>', methods=['GET'])
+def read_status(idx):
+    token_receive = request.cookies.get('mytoken')
+    try:
+        payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
+        now_user_id = db.user.find_one({"user_id": payload["id"]}, {"_id": False})['user_id']
+        user_id = db.til.find_one({'til_idx': int(idx)}, {'_id': False})['til_user']
+        til_user_id = db.user.find_one({'user_id': user_id}, {'id': False})['user_id']
+        print(user_id, til_user_id)
+        status = bool(now_user_id == til_user_id)
+        return jsonify({"status": status})
+        
+    except (jwt.ExpiredSignatureError, jwt.exceptions.DecodeError):
+        return redirect(url_for("login"))
 
 
 @app.route('/til/<idx>', methods=['DELETE'])
@@ -291,7 +337,6 @@ def update_like():
         else:
             db.like.delete_one(doc)
         count = db.like.count_documents({"til_idx": til_idx_receive, "type": type_receive})
-        print(count)
         return jsonify({"result": "success", 'msg': 'updated', "count": count})
     except jwt.ExpiredSignatureError:
         return jsonify({'result': 'fail', 'msg': '로그인 시간이 만료되었습니다.'})
@@ -307,7 +352,9 @@ def create_user():
 
     pw_hash = hashlib.sha256(user_password.encode('utf-8')).hexdigest()
 
-    doc = {'user_id': user_id, 'user_password': pw_hash, 'user_nickname': user_nickname, 'github_id': '', 'user_profile_pic': '', 'user_profile_pic_real': 'static/profile_pics/profile_placeholder.png', 'user_profile_info': ''}
+    doc = {'user_id': user_id, 'user_password': pw_hash, 'user_nickname': user_nickname, 'github_id': '',
+           'user_profile_pic': '', 'user_profile_pic_real': 'static/profile_pics/profile_placeholder.png',
+           'user_profile_info': ''}
 
     db.user.insert_one(doc)
     return jsonify({'result': 'success'})
@@ -316,7 +363,6 @@ def create_user():
 @app.route('/user', methods=['GET'])
 def read_user():
     token_receive = request.cookies.get('mytoken')
-    print(token_receive)
     try:
         payload = jwt.decode(token_receive, SECRET_KEY, algorithms=['HS256'])
         user_info = db.user.find_one({"user_id": payload["id"]}, {"_id": False, "user_password": False})
@@ -368,13 +414,14 @@ def save_img():
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
+
             file_path = os.environ.get("S3_URI") + str(filename)
 
             new_doc["user_profile_pic"] = filename
             new_doc["user_profile_pic_real"] = file_path
             s3 = boto3.client('s3',
-                              aws_access_key_id = os.environ.get("AWS_ACCESS_KEY_ID"),
-                              aws_secret_access_key = os.environ.get("AWS_SECRET_ACCESS_KEY")
+                              aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+                              aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY")
                               )
             s3.put_object(
                 ACL="public-read",
@@ -391,4 +438,3 @@ def save_img():
 
 if __name__ == '__main__':
     app.run('0.0.0.0', port=5000, debug=True)
-
