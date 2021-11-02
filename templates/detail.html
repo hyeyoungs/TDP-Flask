@@ -38,17 +38,22 @@
 
     <script>
         $(document).ready(function () {
+            idx = window.location.search.split("=")[1]
             $('#new-box').hide();
             get_til();
-            status();
+            get_status();
+            get_heart();
+            get_comment();
+            get_user();
         });
         var idx;
         function get_status() {
             $.ajax({
                 type: "GET",
-                url: `/status`,
+                url: `/status/${idx}`,
                 data: {},
                 success: function (response) {
+
                     let status = response['status']
                     if (status) {
                         let temp_html =
@@ -60,58 +65,68 @@
             });
         }
         function get_heart() {
+
             $.ajax({
                 type: "GET",
-                url: `/heart`,
+                url: `/heart/${idx}`,
                 data: {},
                 success: function (response) {
-                    let title = response['til']['til_title']
-                    let content = response['til']['til_content']
-                    let user = response['til']['til_user']
-                    idx = response['til']['til_idx']
-                    $("#til-title").val(title);
-                    $("#til-content").val(content);
+
+                    let count = response['count']
+                    let action = response['action']
+                    console.log(count)
+                    console.log(action)
+
+                    $("#heart-count").text(count);
+                    if (action) {
+                        let temp_html = `<i class="fa fa-heart" aria-hidden="true"></i>`
+                        $('#now-heart').append(temp_html)
 
 
+                    } else {
+                        let temp_html = `<i class="fa fa-heart-o" aria-hidden="true"></i>`
+                        $('#now-heart').append(temp_html)
+                    }
 
                 }
+
             });
         }
+
 
 
         function get_til() {
             $.ajax({
                 type: "GET",
-                url: `/til`,
-                async: false,
+                url: `/til/${idx}`,
                 data: {},
                 success: function (response) {
                     let title = response['til']['til_title']
                     let content = response['til']['til_content']
-                    let user = response['til']['til_user']
-                    idx = response['til']['til_idx']
-                    $("#til-title").val(title);
-                    $("#til-content").val(content);
-
-
+                    $("#now-title").text(title);
+                    $("#now-content").text(content);
+                    $("#new-til-title").text(title);
+                    $('#new-til-content').text(content)
 
                 }
             });
         }
 
         function get_user() {
+
             $.ajax({
                 type: "GET",
-                url: `/til/user`,
+                url: `/til/user/${idx}`,
                 data: {},
                 success: function (response) {
+
                     let nickname = response['user_nickname']
                     let githhub_id = response['githhub_id']
                     let profile = response['user_profile_info']
 
-                    $("#user-nickname").val(nickname);
-                    $("#user-githhub_id").val(githhub_id);
-                    $("#user-profile").val(profile);
+                    $("#user-nickname").text(nickname);
+                    $("#user-githhub_id").text(githhub_id);
+                    $("#user-profile").text(profile);
 
                 }
             });
@@ -120,29 +135,28 @@
         function get_comment() {
             $.ajax({
                 type: "GET",
-                url: `/til/comment`,
+                url: `/til/comment/${idx}`,
                 data: {},
                 success: function (response) {
-                    let til_writer_nickname = response['til_writer_nickname']
-                    let comment = response['comment'];
-                    for (let i = 0; i < comment.length; i++) {
-                        let comment = comment[i]['til_comment']
-                        let day = comment[i]['til_comment_day']
-                        let commenter = comment[i]['user_nickmane']
-                        let til_idx = comment[i]['til_idx']
-                        let comment_idx = comment[i]['comment_idx']
+                    let writer = response['writer']
+                    let all_comment = response['comment'];
+
+                    for (let i = 0; i < all_comment.length; i++) {
+                        let comment = all_comment[i]['til_comment']
+                        let day = all_comment[i]['til_comment_day']
+                        let commenter = all_comment[i]['user_nickmane']
+                        let comment_idx = all_comment[i]['comment_idx']
+                        console.log(comment)
 
 
-                        if (commenter == til_writer_nickname) {
+                        if (commenter == writer) {
                             let temp_html =
                                 `<tr>
                                 <td>${commenter}</td>
                                 <td>${comment}</td>
                                 <td>${day}</td>
-                                <td>
-                                    <button type="button" onclick='delete_comment('${comment_idx}')'
-                                            class="btn btn-primary">삭제
-                                    </button>
+                                <td>                             // delete_comment 오류
+                                    <button type="button" onclick='delete_comment('${comment_idx}')' class="btn btn-primary">삭제</button>
                                 </td>
                                 </tr>`
 
@@ -158,11 +172,7 @@
 
                             $('#comment-box').append(temp_html)
                         }
-
-
                     }
-
-
                 }
             });
         }
@@ -171,7 +181,6 @@
         function create_comment() {
             let comment = $("#textarea-post").val()
             let today = new Date().toISOString()
-            let til_idx =
 
                 $.ajax({
                     type: "POST",
@@ -188,26 +197,23 @@
                     }
                 })
         }
-
-
+            // 동작을 안함
         function delete_comment(idx) {
-            idx = parseInt(idx)
             alert(idx)
+            console.log(idx)
             $.ajax({
                 type: "DELETE",
                 url: "/til/comment",
-                data: {
-                    comment_idx_give: idx,
-                },
+                data: {comment_idx_give: idx},
                 success: function (response) {
                     alert(response['msg'])
                     window.location.reload()
                 }
-            })
+            });
         }
 
 
-        function delete_til(idx) {
+        function delete_til() {
             $.ajax({
                 type: "DELETE",
                 url: `/til/${idx}`,
@@ -219,7 +225,7 @@
         }
 
 
-        function update_til(idx) {
+        function update_til() {
             let til_title = $('#new-til-title').val();
             let til_content = $('#new-til-content').val();
             $.ajax({
@@ -259,11 +265,12 @@
             $('#new-box').hide();
         }
 
-        function toggle_like(type) {
+        function toggle_like(idx, type) {
             let til_idx = idx
-            console.log(type)
-            let $a_like = $(`#${til_idx} a[aria-label='heart']`)
-            let $i_like = $a_like.find("i")
+            console.log(til_idx, type)
+            let a_like = $('#heart')
+            let $i_like = a_like.find("i")
+            let like_num = $('#heart-count')
             if ($i_like.hasClass("fa-heart")) {
                 $.ajax({
                     type: "POST",
@@ -274,9 +281,10 @@
                         action_give: "unlike"
                     },
                     success: function (response) {
+
                         console.log("unlike")
                         $i_like.addClass("fa-heart-o").removeClass("fa-heart")
-                        $a_like.find("span.like-num").text(response["count"])
+                        like_num.text(response["count"])
                     }
                 })
             } else {
@@ -290,8 +298,9 @@
                     },
                     success: function (response) {
                         console.log("like")
+
                         $i_like.addClass("fa-heart").removeClass("fa-heart-o")
-                        $a_like.find("span.like-num").text(response["count"])
+                        like_num.text(response["count"])
                     }
                 })
 
@@ -386,16 +395,22 @@
 
         .level-left {
             padding-left: 400px;
+            float: bottom;
         }
 
         .til-title {
-            font-size: large;
+            font-size: xx-large;
             margin: 30px auto;
         }
 
         .content-box {
             text-align: center;
             border-color: #37474F;
+        }
+        .hr6 {
+            border:none;
+            border:5px;
+            double orange;
         }
 
     </style>
@@ -460,26 +475,28 @@
                         <div id="mine">
                         </div>
 
-                        <div>
+                        <div class="til-title" id="now-title">til-title</div>&nbsp
+
+                        <div id="til-idx-box">
                             <div id="til-listing-box">
                                 <nav class="level is-mobile">
                                     <div class="level-left">
-                                        <span class="til-title" id="til-title">til-title</span>
-                                        <a class="level-item is-sparta" aria-label="heart"
-                                           onclick="toggle_like(idx, 'heart')">
-                                        <span class="icon is-small">
-                                            {% if action %}
-                                                <i class="fa fa-heart" aria-hidden="true"></i></span>&nbsp;
-                                            {% else %}
-                                            <i class="fa fa-heart-o" aria-hidden="true"></i></span>&nbsp;
-                                            {% endif %}
-                                            <span class="like-num">count</span>
+
+
+                                        <a class="level-item is-sparta" id="heart" aria-label="heart"
+                                           onclick="toggle_like(idx, 'heart')">&nbsp
+
+                                            <div id="now-heart"></div>&nbsp
+                                            <div id="heart-count" class="like-num">count</div>
                                         </a>
                                     </div>
                                 </nav>
-                                <div id="til-content" class="content-box">
+                                <hr class="hr6">
+                                <h3>content</h3>
+                                <div id="now-content" class="content-box">
                                     til_content
                                 </div>
+                                <hr class="hr6">
 
                             </div>
 
@@ -491,18 +508,19 @@
                     <div id="new-box" class="new-content">
                         <div class="new-box">
                             <label for="exampleFormControlInput1" class="center">제목</label>
-                            <p><textarea class="form-control" id="new-til-title" rows="1">{{ til.til_title }}</textarea>
+                            <p><textarea class="form-control" id="new-til-title" rows="1">til.til_title</textarea>
                             </p>
                             <label for="exampleFormControlInput1" class="center">content</label>
+
                             <textarea class="form-control" id="new-til-content"
-                                      rows="8">{{ til.til_content }}</textarea><br>
+                                      rows="8">til.til_content</textarea><br>
                             <p id="new-content-button"><span class="two-button">
                                 <button type="button" onclick='update_til()'
                                         class="btn btn-primary">변경</button>
                                 <button type="button" onclick='cancle()' class="btn btn-primary">취소</button>
                             </span></p>
                             <br>
-                            <p>{{ til.til_day }}</p>
+                            <p>til.til_day</p>
 
                         </div>
 
