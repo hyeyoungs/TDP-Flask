@@ -414,7 +414,8 @@ def save_img():
             file = request.files["file_give"]
             filename = secure_filename(file.filename)
             extension = filename.split(".")[-1]
-            file_path = os.environ.get("S3_URI") + "/{filename}"
+
+            file_path = os.environ.get("S3_URI") + str(filename)
 
             new_doc["user_profile_pic"] = filename
             new_doc["user_profile_pic_real"] = file_path
