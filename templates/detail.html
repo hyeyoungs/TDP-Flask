@@ -38,6 +38,26 @@
 
     <script>
         $(document).ready(function () {
+            $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('인증 에러!!');
+                            break;
+                        case 423:
+                            alert('중복된 id!!');
+                            break;
+                    }
+                },
+                beforeSend: function (xhr) {
+                    if (localStorage.getItem('token') != null) {
+                        xhr.setRequestHeader('Authorization', localStorage.getItem('token'));
+                    } else {
+                        location.href = "login"
+                        alert("로그인 해주세요")
+                    }
+                }
+            });
             idx = window.location.search.split("=")[1]
             $('#new-box').hide();
             get_til();
@@ -47,6 +67,7 @@
             get_user();
         });
         var idx;
+
         function get_status() {
             $.ajax({
                 type: "GET",
@@ -64,6 +85,7 @@
                 }
             });
         }
+
         function get_heart() {
 
             $.ajax({
@@ -74,8 +96,6 @@
 
                     let count = response['count']
                     let action = response['action']
-                    console.log(count)
-                    console.log(action)
 
                     $("#heart-count").text(count);
                     if (action) {
@@ -92,7 +112,6 @@
 
             });
         }
-
 
 
         function get_til() {
@@ -146,7 +165,6 @@
                         let day = all_comment[i]['til_comment_day']
                         let commenter = all_comment[i]['user_nickmane']
                         let comment_idx = all_comment[i]['comment_idx']
-                        console.log(comment)
 
 
                         if (commenter == writer) {
@@ -182,26 +200,25 @@
             let comment = $("#textarea-post").val()
             let today = new Date().toISOString()
 
-                $.ajax({
-                    type: "POST",
-                    url: "/til/comment",
-                    data: {
-                        comment_give: comment,
-                        date_give: today,
-                        til_idx_give: idx
-                    },
-                    success: function (response) {
-                        alert(response['msg'])
-                        $("#modal-post").removeClass("is-active")
-                        window.location.reload()
-                    }
-                })
+            $.ajax({
+                type: "POST",
+                url: "/til/comment",
+                data: {
+                    comment_give: comment,
+                    date_give: today,
+                    til_idx_give: idx
+                },
+                success: function (response) {
+                    alert(response['msg'])
+                    $("#modal-post").removeClass("is-active")
+                    window.location.reload()
+                }
+            })
         }
 
         function delete_comment(comment_idx) {
             comment_idx = parseInt(comment_idx)
             alert(comment_idx)
-            console.log(comment_idx)
             $.ajax({
                 type: "DELETE",
                 url: "/til/comment",
@@ -268,7 +285,6 @@
 
         function toggle_like(idx, type) {
             let til_idx = idx
-            console.log(til_idx, type)
             let a_like = $('#heart')
             let $i_like = a_like.find("i")
             let like_num = $('#heart-count')
@@ -283,7 +299,6 @@
                     },
                     success: function (response) {
 
-                        console.log("unlike")
                         $i_like.addClass("fa-heart-o").removeClass("fa-heart")
                         like_num.text(response["count"])
                     }
@@ -298,7 +313,6 @@
                         action_give: "like"
                     },
                     success: function (response) {
-                        console.log("like")
 
                         $i_like.addClass("fa-heart").removeClass("fa-heart-o")
                         like_num.text(response["count"])
@@ -408,9 +422,10 @@
             text-align: center;
             border-color: #37474F;
         }
+
         .hr6 {
-            border:none;
-            border:5px;
+            border: none;
+            border: 5px;
             double orange;
         }
 
@@ -476,7 +491,8 @@
                         <div id="mine">
                         </div>
 
-                        <div class="til-title" id="now-title">til-title</div>&nbsp
+                        <div class="til-title" id="now-title">til-title</div>
+                        &nbsp
 
                         <div id="til-idx-box">
                             <div id="til-listing-box">
@@ -487,7 +503,8 @@
                                         <a class="level-item is-sparta" id="heart" aria-label="heart"
                                            onclick="toggle_like(idx, 'heart')">&nbsp
 
-                                            <div id="now-heart"></div>&nbsp
+                                            <div id="now-heart"></div>
+                                            &nbsp
                                             <div id="heart-count" class="like-num">count</div>
                                         </a>
                                     </div>
