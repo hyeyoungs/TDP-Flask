@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 
-
+   <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
@@ -23,13 +23,33 @@
     <title>Title | TIL.D.P</title>
 </head>
 <script>
-
-
+    const xhr = new XMLHttpRequest();
     $(document).ready(function () {
+         $.ajaxSetup({
+            error: function (jqXHR, exception) {
+                switch (jqXHR.status) {
+                    case 401:
+                        alert('인증 에러!!');
+                        break;
+                    case 423:
+                        alert('중복된 id!!');
+                        break;
+                }
+            },
+            beforeSend: function (xhr) {
+                if (localStorage.getItem('token') != null) {
+                    xhr.setRequestHeader('Authorization', localStorage.getItem('token'));
+                } else {
+                    location.href = "login"
+                    alert("로그인 해주세요")
+                }
+            }
+        });
         list_til();
         rank_til();
         state_home_switch();
     });
+
 
     function read_flag() {
         $.ajax({
@@ -39,16 +59,14 @@
                 async: false,
                 success: function (response) {
                     flag = response['flag'];
-                    console.log(flag)
+
                 }
-            }
-        )
+            });
         return flag;
     }
 
     async function state_home_switch() {
         let flag = await read_flag();
-        console.log(flag)
         if (flag === 0) {
             $(".test").css("background-color", 'red');
         } else if (flag === 1) {
@@ -109,7 +127,6 @@
 `
 
                         $('#ranker-box').append(temp_html)
-                        console.log(temp_html)
                     }
                 }
             }
@@ -118,7 +135,7 @@
 
     function sign_out() {
         {#'mytoken', response['token']#}
-        $.removeCookie('mytoken', {path: '/'});
+        localStorage.removeItem('token');
         alert('로그아웃!')
         window.location.href = "/"
     }

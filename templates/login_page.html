@@ -407,7 +407,6 @@
     <!-- Function -->
     <script>
         /* ------------------------------------ Click on login and Sign Up to  changue and view the effect --------------------------------------- */
-
         function cambiar_login() {
             document.querySelector('.cont_forms').className = "cont_forms cont_forms_active_login";
             document.querySelector('.cont_form_login').style.display = "block";
@@ -445,7 +444,7 @@
                 data: {user_id_give: $('#user_id').val(), user_pw_give: $('#user_pw').val()},
                 success: function (response) {
                     if (response['result'] === 'success') {
-                        $.cookie('mytoken', response['token'],{path: '/'});
+                        localStorage.setItem('token', response['token']);
                         alert('로그인 완료!')
                         window.location.href = '/main_page';
                     } else {
@@ -504,7 +503,6 @@
             let user_pw = $("#sign_pw").val()
             let user_nick = $("#sign_nick").val()
             let user_check_pw = $("#sign_confirm_pw").val()
-            console.log(user_id)
             if (user_id === "") {
                 alert("아이디를 입력해주세요")
                 return
