@@ -31,6 +31,66 @@
             src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 
     <script>
+        $(document).ready(function () {
+            $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('인증 에러!!');
+                            break;
+                        case 423:
+                            alert('중복된 id!!');
+                            break;
+                    }
+                },
+                beforeSend: function (xhr) {
+                    if (localStorage.getItem('token') != null) {
+                        xhr.setRequestHeader('Authorization', localStorage.getItem('token'));
+                    } else {
+                        location.href = "login"
+                        alert("로그인 해주세요")
+                    }
+                }
+            });
+            read_user_profile();
+            append_github_id();
+
+        });
+
+        function read_user() {
+            $.ajax({
+                type: "GET",
+                url: "/user",
+                async: false,
+                success: function (response) {
+                    user_info = response['user_info'];
+                }
+            });
+            return user_info;
+        }
+
+        async function read_user_profile(){
+            let user_info = await read_user();
+            $('.user_id_append').text(user_info['user_id']);
+            $('.user_nickname_append').text(user_info['user_nickname']);
+            $('.user_profile_info_append').text(user_info['user_profile_info']);
+            $('.user_profile_pic_append').text(user_info['user_profile_pic']);
+            $('.github_id_append').text(user_info['github_id']);
+            $('.user_id_append').val(user_info['user_id']);
+            $('.user_nickname_append').val(user_info['user_nickname']);
+            $('.user_profile_info_append').val(user_info['user_profile_info']);
+            $('.user_profile_pic_append').val(user_info['user_profile_pic']);
+            $('.user_profile_pic_real_append').attr('src', user_info['user_profile_pic_real']);
+            $('.github_id_append').val(user_info['github_id']);
+        }
+
+        async function append_github_id(){
+            let user_info = await read_user();
+            let github_id = user_info['github_id']
+            if (github_id == ''){
+                $('.github_id_tag').hide();
+            }
+        }
 
         function goback() {
             window.history.back();
@@ -46,7 +106,6 @@
             form_data.append("nickname_give", nickname)
             form_data.append("github_id_give", github_id)
             form_data.append("about_give", about)
-            console.log(name, file, nickname, github_id, about, form_data)
 
             $.ajax({
                 type: "POST",
@@ -131,21 +190,18 @@
         <article class="media">
             <figure style="align-self: center">
                 <a class="image is-96x96" href="#">
-                    <img class="is-rounded" src="{{ user_info.user_profile_pic_real }}">
+                    <img class="is-rounded user_profile_pic_real_append" src="">
                 </a>
             </figure>
 
             <div class="media-content">
                 <div class="content">
                     <div>
-                        <strong>{{ user_info.user_nickname }}</strong> <small>@{{ user_info.user_id }}</small>
+                        <strong class="user_nickname_append"></strong> <small>@<label class="user_id_append"></label></small>
                     </div>
-                    <div>
-                        {{ user_info.user_profile_info }}
+                    <div class="user_profile_info_append">
                     </div>
-                    {% if user_info.github_id != '' %}
-                        <div>Github ID: {{ user_info.github_id }}</div>
-                    {% endif %}
+                        <div class="github_id_tag">Github ID: <label class="github_id_append"></label></div>
                     <div>Followers : 10000</div>
                     <div>Following : 20000</div>
                 </div>
@@ -178,15 +234,15 @@
 
                                 <p class="control">
 
-                                    <input id="input-nickname" class="input"
-                                           placeholder="" value="{{ user_info.user_nickname }}">
+                                    <input id="input-nickname" class="input user_nickname_append"
+                                           placeholder="" value="">
                                 </p>
                             </div>
                             <div class="field">
                                 <label class="label" for="input-github-id">Github ID</label>
                                 <p class="control">
-                                    <input id="input-github-id" class="input"
-                                           placeholder="" value="{{ user_info.github_id }}">
+                                    <input id="input-github-id" class="input  github_id_append"
+                                           placeholder="" value="">
                                 </p>
                             </div>
                             <div class="field">
@@ -201,8 +257,8 @@
                                                 <span class="file-icon"><i class="fa fa-upload"></i></span>
                                                 <span class="file-label">파일 선택</span>
                                             </span>
-                                            <span id="file-name" class="file-name"
-                                                  style="width:100%;max-width:100%">{{ user_info.user_profile_pic }}</span>
+                                            <span id="file-name" class="file-name user_profile_pic_append"
+                                                  style="width:100%;max-width:100%"></span>
                                         </label>
                                     </div>
 
@@ -213,8 +269,8 @@
 
                                 <p class="control">
 
-                        <textarea id="textarea-about" class="textarea"
-                                  placeholder="자기소개하기">{{ user_info.user_profile_info }}</textarea>
+                        <textarea id="textarea-about" class="textarea user_profile_info_append"
+                                  placeholder="자기소개하기"></textarea>
                                 </p>
                             </div>
                             <nav class="level is-mobile">

@@ -32,25 +32,73 @@
     <script>
 
         $(document).ready(function () {
-            list_user_til(`{{ user_info.user_id }}`);
+                        $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('인증 에러!!');
+                            break;
+                        case 423:
+                            alert('중복된 id!!');
+                            break;
+                    }
+                },
+                beforeSend: function (xhr) {
+                    if (localStorage.getItem('token') != null) {
+                        xhr.setRequestHeader('Authorization', localStorage.getItem('token'));
+                    } else {
+                        location.href = "login"
+                        alert("로그인 해주세요")
+                    }
+                }
+            });
+            list_user_til();
+            read_user_profile();
         });
 
+        function read_user() {
+            $.ajax({
+                type: "GET",
+                url: "/user",
+                async: false,
+                success: function (response) {
+                    user_info = response['user_info'];
+                }
+            });
+            return user_info;
+        }
 
-        function list_user_til(til_user) {
+        async function read_user_profile(){
+            let user_info = await read_user();
+            $('.user_id_append').text(user_info['user_id']);
+            $('.user_nickname_append').text(user_info['user_nickname']);
+            $('.user_profile_info_append').text(user_info['user_profile_info']);
+            $('.user_profile_pic_append').text(user_info['user_profile_pic']);
+            $('.github_id_append').text(user_info['github_id']);
+            $('.user_id_append').val(user_info['user_id']);
+            $('.user_nickname_append').val(user_info['user_nickname']);
+            $('.user_profile_info_append').val(user_info['user_profile_info']);
+            $('.user_profile_pic_append').val(user_info['user_profile_pic']);
+            $('.user_profile_pic_real_append').attr('src', user_info['user_profile_pic_real']);
+            $('.github_id_append').val(user_info['github_id']);
+        }
+
+        async function list_user_til() {
+            let user_info = await read_user()
             $.ajax({
                 type: "POST",
                 url: "/til/user",
-                data: {til_user_give: til_user},
+                data: {til_user_give: user_info['user_id']},
                 success: function (response) {
                     let my_til = response['my_til'];
                     for (let i = 0; i < my_til.length; i++) {
-                        make_list_my_til(my_til[i]);
+                        make_list_my_til(my_til[i], user_info);
                     }
                 }
             });
         }
 
-        function make_list_my_til(til){
+        function make_list_my_til(til, user_info){
             let view_str = '';
             if (til['til_view'] == 1) {
                 view_str = '공개';
@@ -71,7 +119,7 @@
                                             </div>
                                             <div class="ml-2">
                                                 <div class="h5 m-0">@${til['til_user']}</div>
-                                                <div class="h7 text-muted">{{ user_info.user_nickname }}</div>
+                                                <div class="h7 text-muted user_nickname_append">${user_info['user_nickname']}</div>
                                             </div>
                                         </div>
                                         <div>
@@ -257,10 +305,9 @@
         <div class="col-md-3">
             <div class="card">
                 <div class="card-body">
-                    <div class="h5">@{{ user_info.user_id }}</div>
-                    <div class="h7 text-muted">Nickname : {{ user_info.user_nickname }}</div>
-                    <div class="h7">{{ user_info.user_profile_info }}
-                    </div>
+                    <div class="h5">@<label class ="text-label user_id_append"></label></div>
+                    <div class="h7 text-muted">Nickname : <label class ="text-label user_nickname_append"></label></div>
+                    <div class="h7"><label class ="text-label user_profile_info_append"></label></div>
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
@@ -271,7 +318,7 @@
                         <div class="h6 text-muted">Following</div>
                         <div class="h5">6758</div>
                     </li>
-                    <li class="list-group-item">Github : {{ user_info.github_id }}</li>
+                    <li class="list-group-item">Github : <label class ="text-label github_id_append"></label></li>
                 </ul>
             </div>
         </div>
