@@ -93,6 +93,7 @@ def read_flag():
     return jsonify({'flag': flag})
 
 
+        # 가져오기 def
 @app.route('/til_board')
 @login_check
 def list_page():

@@ -50,7 +50,6 @@
         state_home_switch();
     });
 
-
     function read_flag() {
         $.ajax({
                 type: "GET",
@@ -67,6 +66,7 @@
 
     async function state_home_switch() {
         let flag = await read_flag();
+
         if (flag === 0) {
             $(".test").css("background-color", 'red');
         } else if (flag === 1) {
