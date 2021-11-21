@@ -72,6 +72,15 @@
                     }
                 }
             });
+            const url = new URL(window.location.href);
+
+// URLSearchParams 객체
+            const urlParams = url.searchParams;
+
+// URLSearchParams.get()
+            keyword=urlParams.get('keyword')
+            setting=urlParams.get('setting')
+            get_tils(keyword,setting)
         });
 
         function sign_out() {
@@ -79,6 +88,54 @@
             alert('로그아웃!')
             window.location.href = "/"
         }
+
+        function get_tils(keyword,setting){
+            $.ajax({
+                    type: "GET",
+                    url: "/til_board_detail?keyword="+keyword+"&setting="+setting,
+                    data: {},
+                    success: function (response) {
+                        let all_til = response['temp'];
+                        for (let i = 0; i < all_til.length; i++) {
+                            let title = all_til[i]['til_title'];
+                            let user = all_til[i]['til_user'];
+
+                            let day = all_til[i]['til_day'];
+                            let til_idx = all_til[i]['til_idx']
+
+                                let temp_html = `<tr onClick="detail('${til_idx}')" style="cursor:pointer;">
+                                                <th scope="row">${title}<img src="static/new.png" height="30" width="30"></th>
+                                                <td>${user}</td>
+                                                <td>${day}</td>
+
+                                            </tr>`
+
+                                $('#til-box').append(temp_html)
+
+
+                        }
+                    }
+                }
+            )
+        }
+
+        function detail(til_idx) {
+            location.href = "/detail" + "?idx="+til_idx;
+        }
+
+
+        function til_search() {
+            let keyword = $('#keyword').val()
+            let setting = $('#setting-btn').text()
+            location.href = "/til_board_detail_page" + "?keyword=" + keyword + "&setting=" + setting;
+            //    로딩바 0.1초
+        }
+
+
+        function search_setting(a) {
+            $('#setting-btn').text(a)
+        }
+
     </script>
 
 
@@ -107,6 +164,8 @@
 </nav>
 
 
+
+
 <div class="container">
     <table class="table">
         <thead class="thead-light">
@@ -121,8 +180,6 @@
             <a class="btn btn-primary" href="create_page" role="button">글쓰기</a>
         </div>
     </div>
-
-
     <div class="container">
         <table id="til-table" class="table">
             <thead>
@@ -130,35 +187,29 @@
                 <th scope="col">제목</th>
                 <th scope="col">작성자</th>
                 <th scope="col">작성일</th>
+
             </tr>
             </thead>
             <tbody id="til-box">
-            {% for now in til %}
-                <tr>
-                    <td>{{ now.til_title }}</td>
-                    <td>{{ now.til_user }}</td>
-                    <td>{{ now.til_day }}</td>
-                </tr>
-            {% endfor %}
             </tbody>
         </table>
-
+        <div class="col-lg-6">
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button id="setting-btn" type="button" class="btn btn-default dropdown-toggle"
+                            data-toggle="dropdown" aria-expanded="false">제목<span class="caret"></span></button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li><a style="cursor:pointer" onclick="search_setting('제목')">제목</a></li>
+                        <li><a style="cursor:pointer" onclick="search_setting('작성자')">작성자</a></li>
+                        <li><a style="cursor:pointer" onclick="search_setting('내용')">내용</a></li>
+                    </ul>
+                </div><!-- /btn-group -->
+                <input id="keyword" type="text" class="form-control" placeholder="검색어를 입력해주세요" aria-label="...">
+                <button onclick="til_search()" type="button" id="btn-search" class="btn btn-primary">검색</button>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->
     </div>
-    <div class="col-lg-6">
-        <div class="input-group">
-            <div class="input-group-btn">
-                <button id="setting-btn" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
-                        aria-expanded="false">제목<span class="caret"></span></button>
-                <ul class="dropdown-menu" role="menu">
-                    <li><a style="cursor:pointer" onclick="search_setting('제목')">제목</a></li>
-                    <li><a style="cursor:pointer" onclick="search_setting('작성자')">작성자</a></li>
-                    <li><a style="cursor:pointer" onclick="search_setting('내용')">내용</a></li>
-                </ul>
-            </div><!-- /btn-group -->
-            <input id="keyword" type="text" class="form-control" placeholder="검색어를 입력해주세요" aria-label="...">
-            <button onclick="til_search()" type="button" id="btn-search" class="btn btn-primary">검색</button>
-        </div><!-- /input-group -->
-    </div><!-- /.col-lg-6 -->
+
 </div>
 </body>
 </html>
