@@ -1,4 +1,4 @@
-# 📝 TDP-Spring
+# 📝 TDP
 ## TDP란?
 -  "Today I Learned Deserter Pursuit"의 약자로서, TIL(Today I Learned) 관리 시스템 입니다.
 
