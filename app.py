@@ -56,7 +56,7 @@ def signup_page():
 @login_check
 def mytil_page():
     userinfo = db.user.find_one({"user_id": g.user_id}, {"_id": False})
-    return render_template('mytil_page.html', userinfo=userinfo)
+    return render_template('mytil_page.html')
 
 
 @app.route('/create_page')
@@ -93,7 +93,6 @@ def read_flag():
     return jsonify({'flag': flag})
 
 
-        # 가져오기 def
 @app.route('/til_board')
 @login_check
 def list_page():
@@ -147,6 +146,10 @@ def delete_comment():
 @app.route('/til_board_detail')
 @login_check
 def search_detail_page():
+    return render_template('til_board_detail.html')
+
+
+def search():
     keyword = request.args.get("keyword")
     setting = request.args.get("setting")
     if setting == '제목':
@@ -155,9 +158,8 @@ def search_detail_page():
         setting = 'til_user'
     else:
         setting = 'til_content'
-    userinfo = db.user.find_one({'id': g.user_id}, {'_id': 0})
     temp = list(db.til.find({setting: keyword}, {'_id': False}))
-    return jsonify({'result': "succes", 'userinfo': userinfo, 'temp': temp})
+    return jsonify({'result': "succes", 'temp': temp})
 
 
 @app.route('/my_page')
