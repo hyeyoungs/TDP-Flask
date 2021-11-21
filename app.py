@@ -143,12 +143,14 @@ def delete_comment():
     return jsonify({'result': "success", 'msg': '삭제 완료'})
 
 
-@app.route('/til_board_detail')
+@app.route('/til_board_detail_page')
 @login_check
 def search_detail_page():
     return render_template('til_board_detail.html')
 
 
+@app.route('/til_board_detail')
+@login_check
 def search():
     keyword = request.args.get("keyword")
     setting = request.args.get("setting")
