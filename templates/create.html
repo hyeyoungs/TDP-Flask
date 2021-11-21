@@ -34,6 +34,26 @@
     </style>
     <script>
         $(document).ready(function () {
+            $.ajaxSetup({
+                error: function (jqXHR, exception) {
+                    switch (jqXHR.status) {
+                        case 401:
+                            alert('인증 에러!!');
+                            break;
+                        case 423:
+                            alert('중복된 id!!');
+                            break;
+                    }
+                },
+                beforeSend: function (xhr) {
+                    if (localStorage.getItem('token') != null) {
+                        xhr.setRequestHeader('Authorization', localStorage.getItem('token'));
+                    } else {
+                        location.href = "login"
+                        alert("로그인 해주세요")
+                    }
+                }
+            });
             read_user_profile();
         });
 
@@ -54,7 +74,7 @@
             return user_info;
         }
 
-        async function read_user_profile(){
+        async function read_user_profile() {
             let user_info = await read_user();
             $('.user_id_append').text(user_info['user_id']);
             $('.user_nickname_append').text(user_info['user_nickname']);
@@ -79,14 +99,15 @@
                 url: "/til",
                 data: {til_title_give: title, til_content_give: content},
                 success: function (response) { // 성공하면
+                    alert("작성완료")
                     window.location.href = "/til_board"
                 }
-            })
+            });
         }
 
         $(document).on('click', '#btnList', function (e) {
             e.preventDefault();
-            window.history.back();
+            window.location.href = "/til_board"
         });
 
         function sign_out() {
@@ -125,7 +146,8 @@
                 <label for="title">제목</label>
                 <input type="text" class="form-control" name="title" id="title" placeholder="제목을 입력해 주세요">
             </div>
-            <p><span>작성자: </span><label for="content" class="user_nickname_append"></label><p>
+            <p><span>작성자: </span><label for="content" class="user_nickname_append"></label>
+            <p>
             <div class="mb-3">
                 <label for="content">내용</label>
                 <textarea class="form-control" rows="5" name="content" id="content"
