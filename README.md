@@ -14,7 +14,7 @@ TIL을 매일 작성할 수 있는 알림 서비스와 TIL을 간편하게 작�
 
 ## What Did We Do
 ### 기능 구현
-#### 1차
+#### 1차 (2021-09-23 ~ 2021-09-30)
 - [x]  TIL CRUD
     - [x]  TIL 작성, 저장
     - [x]  TIL 수정, 삭제
@@ -22,7 +22,7 @@ TIL을 매일 작성할 수 있는 알림 서비스와 TIL을 간편하게 작�
     - [x]  TIL public, private
     - [x]  list both public, private (My Page)
 
-#### 2차
+#### 2차 (2021-10-05 ~ 2021-10-19)
 - [x]  회원가입 CRUD
 - [x]  로그인 / 로그아웃
 - [x]  TIL Search
@@ -30,5 +30,12 @@ TIL을 매일 작성할 수 있는 알림 서비스와 TIL을 간편하게 작�
 - [x]  TIL Comment
 - [x]  TIL Notification
 
+## Team Member
+- [이호상](https://github.com/dpdtydz) (PM, Developer)
+- [김혜영](https://github.com/0sunzero0) (Developer)
+- [이진권](https://github.com/dlwlsrnjs) (Developer)
+
+
 ## How To Use
 더 많은 예시와 사용 예제는 [Wiki](https://github.com/0sunzero0/TDP/wiki)를 참고하세요 📚
+
