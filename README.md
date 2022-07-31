@@ -40,6 +40,6 @@ TIL을 매일 작성할 수 있는 알림 서비스와 TIL을 간편하게 작�
 <br>
 
 ## Team Member
-- [이호상](https://github.com/dpdtydz) (PM, Developer)
-- [김혜영](https://github.com/0sunzero0) (Developer)
-- [이진권](https://github.com/dlwlsrnjs) (Developer)
+- [김혜영](https://github.com/0sunzero0)
+- [이진권](https://github.com/dlwlsrnjs)
+- [이호상](https://github.com/dpdtydz)
