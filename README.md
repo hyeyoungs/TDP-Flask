@@ -20,6 +20,8 @@ TIL을 매일 작성할 수 있는 알림 서비스와 TIL을 간편하게 작�
 2. 노력은 배신하지 않아요 🏆
 3. 프라이빗한 TIL을 작성해요 🔐
 
+<br>
+
 ### 🚀 API
 - TIL CRUD
     - TIL 작성, 저장
@@ -35,11 +37,11 @@ TIL을 매일 작성할 수 있는 알림 서비스와 TIL을 간편하게 작�
 - TIL Comment
 - TIL Notification
 
+<br>
+
 ### 🚀 Technology and What We Learned - [Wiki](https://github.com/0sunzero0/TDP/wiki/4.-Technology-&-What-We-Learned)
 
 <br>
 
 ## Team Member
-- [김혜영](https://github.com/0sunzero0)
-- [이진권](https://github.com/dlwlsrnjs)
-- [이호상](https://github.com/dpdtydz)
+[김혜영](https://github.com/0sunzero0), [이진권](https://github.com/dlwlsrnjs), [이호상](https://github.com/dpdtydz)
